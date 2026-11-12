@@ -1,0 +1,97 @@
+
+/* Casamento em Dia - Estilos gerais */
+
+:root {
+  --rosa: #b77b83;
+  --rosa-claro: #f8e9e9;
+  --bege: #faf6f1;
+  --texto: #40383a;
+  --branco: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--bege);
+  color: var(--texto);
+}
+
+header {
+  background-color: var(--rosa-claro);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+h1 {
+  color: var(--rosa);
+  font-size: 32px;
+}
+
+h2, h3 {
+  color: var(--rosa);
+}
+
+main {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+section {
+  background-color: var(--branco);
+  padding: 25px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+button {
+  background-color: var(--rosa);
+  color: var(--branco);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #9e626c;
+}
+
+@media (max-width: 600px) {
+  main {
+    margin: 15px auto;
+    padding: 12px;
+  }
+
+  header {
+    padding: 25px 15px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  section {
+    padding: 18px;
+  }
+}
