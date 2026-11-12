@@ -1,21 +1,52 @@
 
 import { supabase } from "./supabase.js";
-document.addEventListener("DOMContentLoaded", () => {
-  const formulario = document.getElementById("form-convidado");
-  const campoNome = document.getElementById("nome");
 
-  formulario.addEventListener("submit", (evento) => {
-    evento.preventDefault();
+const token = sessionStorage.getItem("admin_token");
+const lista = document.getElementById("lista-convidados");
 
-    const nome = campoNome.value.trim();
+if (!token) {
+  window.location.replace("login.html");
+} else {
+  carregarConvidados();
+}
 
-    if (!nome) {
-      alert("Informe o nome do convidado.");
+async function chamarAdmin(metodo, dados = null) {
+  const { data, error } = await supabase.functions.invoke(
+    "admin-convidados",
+    {
+      method: metodo,
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      ...(dados !== null ? { body: dados } : {})
+    }
+  );
+
+  if (error) throw error;
+  return data;
+}
+
+async function carregarConvidados() {
+  lista.textContent = "Carregando convidados...";
+
+  try {
+    const resultado = await chamarAdmin("GET");
+    lista.replaceChildren();
+
+    if (!resultado.convidados?.length) {
+      lista.textContent = "Nenhum convidado cadastrado.";
       return;
     }
 
-    alert(`Formulário funcionando! Nome informado: ${nome}`);
-
-    formulario.reset();
-  });
-});
+    for (const convidado of resultado.convidados) {
+      const item = document.createElement("div");
+      item.textContent =
+        `${convidado.nome} — ${convidado.status}`;
+      lista.appendChild(item);
+    }
+  } catch {
+    lista.textContent =
+      "Não foi possível carregar os convidados. " +
+      "Faça login novamente.";
+  }
+}
