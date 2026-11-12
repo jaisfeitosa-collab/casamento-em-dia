@@ -7,7 +7,7 @@ const supabaseUrl =
 
 // Chave pública do projeto Supabase
 const supabaseKey =
-  "COLE_AQUI_SUA_CHAVE_PUBLICA";
+  "sb_publishable_ZpxxlF6x9KOMHij-SvNcgA_x3ZOn8UV";
 
 // Cliente de conexão com o Supabase
 export const supabase = createClient(
