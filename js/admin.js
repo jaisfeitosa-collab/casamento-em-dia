@@ -1,4 +1,5 @@
 
+import { supabase } from "./supabase.js";
 document.addEventListener("DOMContentLoaded", () => {
   const formulario = document.getElementById("form-convidado");
   const campoNome = document.getElementById("nome");
