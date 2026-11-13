@@ -1,42 +1,56 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Administrativo | Casamento em Dia</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="pagina-admin">
-
-  <header>
-    <h1>Casamento em Dia</h1>
-    <h2>Painel Administrativo</h2>
+  <header class="admin-topbar">
+    <div class="admin-topbar-inner">
+      <div>
+        <h1>Casamento em Dia</h1>
+        <p>Organização e acompanhamento das confirmações</p>
+      </div>
+      <span class="eyebrow">Marina & Gabriel · Demonstração</span>
+    </div>
   </header>
 
-  <main>
-    <section>
-      <h3>Cadastrar convidado</h3>
+  <main class="admin-main">
+    <div class="admin-heading">
+      <p class="eyebrow">Área do organizador</p>
+      <h2>Painel administrativo</h2>
+      <p>Acompanhe os convidados e organize as confirmações do evento.</p>
+    </div>
 
-      <form id="form-convidado">
-        <label for="nome">Nome do convidado:</label>
-        <input type="text" id="nome" required>
-
-        <button type="submit">
-          Cadastrar convidado
-        </button>
-      </form>
+    <section class="stats-grid" aria-label="Indicadores de convidados">
+      <article class="card stat-card"><span class="stat-label">Total de convidados</span><strong class="stat-value">—</strong><span class="help-text">Aguardando dados</span></article>
+      <article class="card stat-card"><span class="stat-label">Confirmados</span><strong class="stat-value">—</strong><span class="help-text">Aguardando dados</span></article>
+      <article class="card stat-card"><span class="stat-label">Pendentes</span><strong class="stat-value">—</strong><span class="help-text">Aguardando dados</span></article>
     </section>
 
-    <section>
-      <h3>Lista de convidados</h3>
-      <div id="lista-convidados">
-        <p>Nenhum convidado cadastrado.</p>
-      </div>
-    </section>
+    <div class="admin-grid">
+      <section class="card admin-section">
+        <h3>Cadastrar convidado</h3>
+        <form id="form-convidado">
+          <div class="field">
+            <label for="nome">Nome do convidado</label>
+            <input type="text" id="nome" name="nome" placeholder="Ex.: Ana Souza" required>
+          </div>
+          <button class="btn" type="submit">Cadastrar convidado</button>
+        </form>
+        <p class="admin-note">O cadastro será habilitado quando a função de envio estiver integrada ao sistema.</p>
+      </section>
+
+      <section class="card admin-section">
+        <h3>Lista de convidados</h3>
+        <div id="lista-convidados"><p>Nenhum convidado cadastrado.</p></div>
+      </section>
+    </div>
   </main>
 
- <script type="module" src="js/admin.js"></script>
+  <script type="module" src="js/admin.js"></script>
 </body>
 </html>
+
