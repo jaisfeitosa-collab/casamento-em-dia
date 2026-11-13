@@ -4,11 +4,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Casamento em Dia</title>
+  <meta name="description" content="Confirme sua presença no casamento de Marina e Gabriel.">
+  <title>Marina & Gabriel | Casamento em Dia</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="pagina-convite">
-  <h1>Casamento em Dia</h1>
-  <p>Bem-vindo ao sistema de confirmação de presença!</p>
+  <main class="invitation-shell">
+    <section class="invitation-hero">
+      <p class="eyebrow">Com carinho, convidamos você</p>
+      <h1 class="couple-names">Marina <span class="ampersand">&</span> Gabriel</h1>
+      <p class="invitation-message">Estamos preparando um dia muito especial e queremos compartilhar esse momento com pessoas queridas como você.</p>
+      <div class="invitation-details">
+        <span>28 de novembro de 2026</span>
+        <span>16 horas</span>
+        <span>Espaço Jardim das Oliveiras</span>
+      </div>
+    </section>
+
+    <section class="invitation-content" aria-labelledby="rsvp-title">
+      <p class="eyebrow">Sua presença é importante</p>
+      <h2 id="rsvp-title">Confirme sua presença</h2>
+      <p class="muted">Por favor, informe se poderá celebrar conosco.</p>
+
+      <!-- Protótipo visual: a integração do RSVP será implementada em etapa própria. -->
+      <form class="rsvp-form" id="form-rsvp">
+        <div class="field">
+          <label for="nome-convidado">Nome do convidado</label>
+          <input id="nome-convidado" name="nome" type="text" placeholder="Digite seu nome" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label>Você poderá comparecer?</label>
+          <div class="choice-grid">
+            <label class="choice"><input type="radio" name="presenca" value="confirmado" required> Sim, estarei presente!</label>
+            <label class="choice"><input type="radio" name="presenca" value="ausente"> Infelizmente, não poderei ir.</label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="acompanhantes">Quantidade de acompanhantes</label>
+          <select id="acompanhantes" name="acompanhantes">
+            <option value="0">Nenhum acompanhante</option>
+            <option value="1">1 acompanhante</option>
+            <option value="2">2 acompanhantes</option>
+          </select>
+          <span class="help-text">A quantidade permitida deverá ser definida pelo organizador do evento.</span>
+        </div>
+        <button class="btn" type="button" onclick="document.getElementById('aviso-prototipo').hidden = false">Enviar confirmação</button>
+        <p id="aviso-prototipo" class="help-text" role="status" hidden>Esta é uma demonstração visual. O envio da resposta será conectado ao sistema na próxima etapa.</p>
+      </form>
+    </section>
+    <footer class="invitation-footer">Com amor, Marina & Gabriel · Convite demonstrativo do Casamento em Dia</footer>
+  </main>
 </body>
 </html>
