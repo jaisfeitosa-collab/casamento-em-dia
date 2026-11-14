@@ -1,59 +1,131 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Administrativo | Casamento em Dia</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Painel Administrativo | Casamento em Dia
+  </title>
+
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body class="pagina-admin">
 
+  <!-- CABEÇALHO -->
   <header class="admin-topbar">
     <div class="admin-topbar-inner">
+
       <div>
         <h1>Casamento em Dia</h1>
-        <p>Organização e acompanhamento das confirmações</p>
+        <p>
+          Organização e acompanhamento das confirmações
+        </p>
       </div>
-      <span class="eyebrow">Marina & Gabriel · Demonstração</span>
+
+      <span class="eyebrow">
+        Marina & Gabriel · Demonstração
+      </span>
+
     </div>
   </header>
 
   <main class="admin-main">
 
+    <!-- TÍTULO -->
     <div class="admin-heading">
       <p class="eyebrow">Área do organizador</p>
+
       <h2>Painel administrativo</h2>
-      <p>Acompanhe os convidados e organize as confirmações do evento.</p>
+
+      <p>
+        Acompanhe os convidados e organize
+        as confirmações do evento.
+      </p>
     </div>
 
-    <!-- Indicadores -->
-    <section class="stats-grid" aria-label="Indicadores de convidados">
+    <!-- INDICADORES - US10 -->
+    <section
+      class="stats-grid"
+      aria-label="Indicadores de convidados"
+    >
 
-      <article class="card stat-card">
-        <span class="stat-label">Total de convidados</span>
+      <!-- TOTAL -->
+      <article
+        class="card stat-card"
+        id="indicador-total"
+      >
+        <span class="stat-label">
+          Total de convidados
+        </span>
+
         <strong class="stat-value">—</strong>
-        <span class="help-text">Aguardando dados</span>
+
+        <span class="help-text">
+          Aguardando dados
+        </span>
       </article>
 
-      <article class="card stat-card">
-        <span class="stat-label">Confirmados</span>
+      <!-- CONFIRMADOS -->
+      <article
+        class="card stat-card"
+        id="indicador-confirmados"
+      >
+        <span class="stat-label">
+          Confirmados
+        </span>
+
         <strong class="stat-value">—</strong>
-        <span class="help-text">Aguardando dados</span>
+
+        <span class="help-text">
+          Aguardando dados
+        </span>
       </article>
 
-      <article class="card stat-card">
-        <span class="stat-label">Pendentes</span>
+      <!-- AUSENTES -->
+      <article
+        class="card stat-card"
+        id="indicador-ausentes"
+      >
+        <span class="stat-label">
+          Não comparecerão
+        </span>
+
         <strong class="stat-value">—</strong>
-        <span class="help-text">Aguardando dados</span>
+
+        <span class="help-text">
+          Aguardando dados
+        </span>
+      </article>
+
+      <!-- PENDENTES -->
+      <article
+        class="card stat-card"
+        id="indicador-pendentes"
+      >
+        <span class="stat-label">
+          Pendentes
+        </span>
+
+        <strong class="stat-value">—</strong>
+
+        <span class="help-text">
+          Aguardando dados
+        </span>
       </article>
 
     </section>
 
+    <!-- ÁREA ADMINISTRATIVA -->
     <div class="admin-grid">
 
-      <!-- Cadastro de convidados -->
+      <!-- CADASTRO - US01 -->
       <section class="card admin-section">
 
         <h3>Cadastrar convidado</h3>
@@ -61,7 +133,11 @@
         <form id="form-convidado">
 
           <div class="field">
-            <label for="nome">Nome do convidado</label>
+
+            <label for="nome">
+              Nome do convidado
+            </label>
+
             <input
               type="text"
               id="nome"
@@ -70,6 +146,7 @@
               maxlength="150"
               required
             >
+
           </div>
 
           <button class="btn" type="submit">
@@ -79,18 +156,20 @@
         </form>
 
         <p class="admin-note">
-          Cadastre os convidados para organizar e acompanhar suas confirmações.
+          Cadastre os convidados para organizar
+          e acompanhar suas confirmações.
         </p>
 
       </section>
 
-      <!-- Lista de convidados -->
+      <!-- LISTA DE CONVIDADOS -->
       <section class="card admin-section">
 
         <h3>Lista de convidados</h3>
 
-        <!-- Pesquisa por nome -->
+        <!-- PESQUISA - US09 -->
         <div class="field">
+
           <label for="busca-convidado">
             Pesquisar convidado
           </label>
@@ -100,23 +179,39 @@
             id="busca-convidado"
             placeholder="Digite o nome do convidado"
           >
+
         </div>
 
-        <!-- Filtro por status -->
+        <!-- FILTRO POR STATUS - US09 -->
         <div class="field">
+
           <label for="filtro-status">
             Filtrar por status
           </label>
 
           <select id="filtro-status">
-            <option value="Todos">Todos</option>
-            <option value="Pendente">Pendentes</option>
-            <option value="Confirmado">Confirmados</option>
-            <option value="Não comparecerá">Não comparecerão</option>
+
+            <option value="Todos">
+              Todos
+            </option>
+
+            <option value="Pendente">
+              Pendentes
+            </option>
+
+            <option value="Confirmado">
+              Confirmados
+            </option>
+
+            <option value="Não comparecerá">
+              Não comparecerão
+            </option>
+
           </select>
+
         </div>
 
-        <!-- Resultado da lista -->
+        <!-- RESULTADO DA LISTA -->
         <div id="lista-convidados">
           <p>Nenhum convidado cadastrado.</p>
         </div>
@@ -127,7 +222,11 @@
 
   </main>
 
-  <script type="module" src="js/admin.js"></script>
+  <!-- JAVASCRIPT -->
+  <script
+    type="module"
+    src="js/admin.js"
+  ></script>
 
 </body>
 </html>
