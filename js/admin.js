@@ -9,7 +9,7 @@ const lista = document.getElementById("lista-convidados");
 const formulario = document.getElementById("form-convidado");
 const campoNome = document.getElementById("nome");
 
-// Verificar se existe uma sessão
+// Verificar sessão administrativa
 if (!token) {
   window.location.replace("login.html");
 } else {
@@ -50,9 +50,23 @@ async function carregarConvidados() {
 
     for (const convidado of resultado.convidados) {
       const item = document.createElement("div");
+      item.className = "item-convidado";
 
-      item.textContent =
+      const informacoes = document.createElement("span");
+      informacoes.textContent =
         `${convidado.nome} — ${convidado.status}`;
+
+      const botaoEditar = document.createElement("button");
+      botaoEditar.type = "button";
+      botaoEditar.textContent = "Editar";
+      botaoEditar.className = "botao-editar";
+
+      botaoEditar.addEventListener("click", () => {
+        editarConvidado(convidado);
+      });
+
+      item.appendChild(informacoes);
+      item.appendChild(botaoEditar);
 
       lista.appendChild(item);
     }
@@ -112,3 +126,51 @@ formulario.addEventListener("submit", async (evento) => {
     }
   }
 });
+
+// Editar um convidado existente
+async function editarConvidado(convidado) {
+  const novoNome = prompt(
+    "Digite o novo nome do convidado:",
+    convidado.nome
+  );
+
+  // Cancelamento da edição
+  if (novoNome === null) {
+    return;
+  }
+
+  const nome = novoNome.trim();
+
+  if (!nome) {
+    alert("O nome não pode ficar vazio.");
+    return;
+  }
+
+  if (nome.length > 150) {
+    alert("O nome deve ter no máximo 150 caracteres.");
+    return;
+  }
+
+  if (nome === convidado.nome) {
+    return;
+  }
+
+  try {
+    await chamarAdmin("PATCH", {
+      id: convidado.id,
+      nome,
+      contato: convidado.contato
+    });
+
+    await carregarConvidados();
+
+    alert("Convidado atualizado com sucesso!");
+  } catch (erro) {
+    console.error("Erro ao editar convidado:", erro);
+
+    alert(
+      "Não foi possível atualizar o convidado. " +
+      "Verifique sua sessão e tente novamente."
+    );
+  }
+}
