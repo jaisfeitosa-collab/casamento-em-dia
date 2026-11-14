@@ -56,6 +56,7 @@ async function carregarConvidados() {
       informacoes.textContent =
         `${convidado.nome} — ${convidado.status}`;
 
+      // Botão Editar
       const botaoEditar = document.createElement("button");
       botaoEditar.type = "button";
       botaoEditar.textContent = "Editar";
@@ -65,8 +66,19 @@ async function carregarConvidados() {
         editarConvidado(convidado);
       });
 
+      // Botão Excluir
+      const botaoExcluir = document.createElement("button");
+      botaoExcluir.type = "button";
+      botaoExcluir.textContent = "Excluir";
+      botaoExcluir.className = "botao-excluir";
+
+      botaoExcluir.addEventListener("click", () => {
+        excluirConvidado(convidado);
+      });
+
       item.appendChild(informacoes);
       item.appendChild(botaoEditar);
+      item.appendChild(botaoExcluir);
 
       lista.appendChild(item);
     }
@@ -134,10 +146,7 @@ async function editarConvidado(convidado) {
     convidado.nome
   );
 
-  // Cancelamento da edição
-  if (novoNome === null) {
-    return;
-  }
+  if (novoNome === null) return;
 
   const nome = novoNome.trim();
 
@@ -151,9 +160,7 @@ async function editarConvidado(convidado) {
     return;
   }
 
-  if (nome === convidado.nome) {
-    return;
-  }
+  if (nome === convidado.nome) return;
 
   try {
     await chamarAdmin("PATCH", {
@@ -175,3 +182,28 @@ async function editarConvidado(convidado) {
   }
 }
 
+// Excluir um convidado
+async function excluirConvidado(convidado) {
+  const confirmar = confirm(
+    `Tem certeza que deseja excluir "${convidado.nome}"?`
+  );
+
+  if (!confirmar) return;
+
+  try {
+    await chamarAdmin("DELETE", {
+      id: convidado.id
+    });
+
+    await carregarConvidados();
+
+    alert("Convidado excluído com sucesso!");
+  } catch (erro) {
+    console.error("Erro ao excluir convidado:", erro);
+
+    alert(
+      "Não foi possível excluir o convidado. " +
+      "Verifique sua sessão e tente novamente."
+    );
+  }
+}
