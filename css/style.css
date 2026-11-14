@@ -1,97 +1,109 @@
-
-/* Casamento em Dia - Estilos gerais */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
 
 :root {
-  --rosa: #b77b83;
-  --rosa-claro: #f8e9e9;
-  --bege: #faf6f1;
-  --texto: #40383a;
-  --branco: #ffffff;
+  --rosa: #ad737d;
+  --rosa-escuro: #895761;
+  --rosa-claro: #f5e7e8;
+  --rosa-suave: #fbf3f2;
+  --bege: #faf7f3;
+  --texto: #463d3e;
+  --texto-suave: #837779;
+  --branco: #fff;
+  --borda: #eadfe0;
+  --verde: #668575;
+  --sombra: 0 12px 34px rgba(88, 61, 65, .08);
 }
 
-* {
-  box-sizing: border-box;
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; color: var(--texto); background: var(--bege); font-family: 'DM Sans', Arial, sans-serif; line-height: 1.6; }
+button, input, select { font: inherit; }
+a { color: inherit; }
+h1, h2, h3, .serif { font-family: 'Playfair Display', Georgia, serif; font-weight: 500; line-height: 1.2; }
+
+/* Elementos compartilhados */
+.site-header { padding: 22px 5%; display: flex; align-items: center; justify-content: space-between; gap: 20px; background: rgba(255,255,255,.86); border-bottom: 1px solid var(--borda); }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--rosa-escuro); font-family: 'Playfair Display', Georgia, serif; font-size: 1.35rem; }
+.brand-mark { width: 40px; height: 40px; border: 1px solid #d8b7bc; border-radius: 50%; display: grid; place-items: center; color: var(--rosa); font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; }
+.eyebrow { color: var(--rosa); font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.muted { color: var(--texto-suave); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 999px; padding: 13px 23px; background: var(--rosa); color: var(--branco); text-decoration: none; font-weight: 700; cursor: pointer; transition: .2s ease; }
+.btn:hover { background: var(--rosa-escuro); transform: translateY(-1px); }
+.btn:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #dfbfc4; outline-offset: 2px; }
+.btn-secondary { background: var(--rosa-claro); color: var(--rosa-escuro); }
+.btn-secondary:hover { background: #ecd7da; }
+.card { background: var(--branco); border: 1px solid rgba(234,223,224,.85); border-radius: 20px; box-shadow: var(--sombra); }
+.field { display: grid; gap: 7px; margin-bottom: 17px; }
+.field label { font-weight: 700; font-size: .9rem; }
+.field input, .field select { width: 100%; min-height: 48px; padding: 12px 14px; color: var(--texto); background: #fffdfc; border: 1px solid var(--borda); border-radius: 10px; }
+.help-text { color: var(--texto-suave); font-size: .82rem; }
+
+/* Convite e RSVP */
+.pagina-convite { min-height: 100vh; background: var(--bege); }
+.invitation-shell { width: min(100% - 32px, 920px); margin: 42px auto; overflow: hidden; background: var(--branco); border: 1px solid var(--borda); border-radius: 24px; box-shadow: var(--sombra); }
+.invitation-hero { position: relative; padding: 62px 28px 54px; text-align: center; background: linear-gradient(145deg, #fbf1ef, #f7e8e9 55%, #fcf8f3); }
+.invitation-hero:before, .invitation-hero:after { content: '✿'; position: absolute; color: rgba(173,115,125,.28); font-size: 4rem; }
+.invitation-hero:before { top: 18px; left: 7%; transform: rotate(-20deg); }
+.invitation-hero:after { right: 7%; bottom: 14px; transform: rotate(20deg); }
+.invitation-hero .eyebrow { margin-bottom: 18px; }
+.couple-names { margin: 0; color: #76545b; font-size: clamp(2.7rem, 7vw, 4.8rem); }
+.ampersand { color: var(--rosa); font-style: italic; }
+.invitation-message { max-width: 510px; margin: 18px auto 0; color: #79696a; }
+.invitation-details { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 34px; margin-top: 28px; color: #76545b; font-weight: 600; }
+.invitation-content { width: min(100% - 40px, 570px); margin: 0 auto; padding: 38px 0 44px; text-align: center; }
+.invitation-content h2 { margin: 0 0 8px; color: var(--rosa-escuro); font-size: 2rem; }
+.rsvp-form { margin-top: 26px; text-align: left; }
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.choice { display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 13px; border: 1px solid var(--borda); border-radius: 12px; background: #fffdfc; cursor: pointer; }
+.choice input { accent-color: var(--rosa); }
+.invitation-footer { padding: 18px; text-align: center; color: var(--texto-suave); background: var(--rosa-suave); font-size: .8rem; }
+
+/* Login */
+.pagina-login { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at top left, #f5e5e6, transparent 42%), var(--bege); }
+.login-card { width: min(100%, 430px); padding: 42px; text-align: center; }
+.login-card .brand-mark { margin: 0 auto 16px; width: 54px; height: 54px; font-size: 1.4rem; }
+.login-card h1 { margin: 0; color: var(--rosa-escuro); font-size: 2.25rem; }
+.login-card h2 { margin: 8px 0 26px; color: var(--texto-suave); font: 500 1rem 'DM Sans', sans-serif; }
+.login-card form { text-align: left; }
+.login-card .btn { width: 100%; }
+#mensagem-login { min-height: 24px; color: #a34d58; font-size: .88rem; }
+
+/* Painel administrativo */
+.pagina-admin { min-height: 100vh; }
+.admin-topbar { background: var(--branco); border-bottom: 1px solid var(--borda); }
+.admin-topbar-inner { width: min(1180px, 92%); margin: auto; min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.admin-topbar h1 { margin: 0; color: var(--rosa-escuro); font-size: 1.65rem; }
+.admin-topbar p { margin: 3px 0 0; color: var(--texto-suave); font-size: .86rem; }
+.admin-main { width: min(1180px, 92%); margin: 36px auto 60px; }
+.admin-heading { margin-bottom: 25px; }
+.admin-heading h2 { margin: 0 0 6px; color: var(--texto); font-size: 2rem; }
+.admin-heading p { margin: 0; color: var(--texto-suave); }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+.stat-card { padding: 21px; }
+.stat-label { color: var(--texto-suave); font-size: .86rem; }
+.stat-value { display: block; margin-top: 6px; color: var(--rosa-escuro); font: 600 2rem 'Playfair Display', Georgia, serif; }
+.admin-grid { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(0, 1.7fr); gap: 20px; align-items: start; }
+.admin-section { padding: 25px; }
+.admin-section h3 { margin: 0 0 18px; color: var(--rosa-escuro); font-size: 1.45rem; }
+.admin-section .btn { width: 100%; }
+#lista-convidados { display: grid; gap: 10px; }
+#lista-convidados > div { padding: 13px 15px; background: #fffaf9; border: 1px solid var(--borda); border-radius: 10px; }
+#lista-convidados p { margin: 0; color: var(--texto-suave); }
+.admin-note { margin-top: 15px; color: var(--texto-suave); font-size: .8rem; }
+
+@media (max-width: 760px) {
+  .admin-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .admin-topbar-inner { padding: 15px 0; align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 520px) {
+  .invitation-shell { margin: 16px auto; border-radius: 17px; }
+  .invitation-hero { padding: 52px 18px 42px; }
+  .invitation-details { flex-direction: column; gap: 7px; }
+  .invitation-content { width: calc(100% - 34px); padding: 30px 0; }
+  .choice-grid { grid-template-columns: 1fr; }
+  .login-card { padding: 30px 22px; }
+  .admin-main { margin-top: 25px; }
+  .admin-section { padding: 19px; }
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background-color: var(--bege);
-  color: var(--texto);
-}
-
-header {
-  background-color: var(--rosa-claro);
-  text-align: center;
-  padding: 40px 20px;
-}
-
-h1 {
-  color: var(--rosa);
-  font-size: 32px;
-}
-
-h2, h3 {
-  color: var(--rosa);
-}
-
-main {
-  max-width: 900px;
-  margin: 30px auto;
-  padding: 20px;
-}
-
-section {
-  background-color: var(--branco);
-  padding: 25px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-button {
-  background-color: var(--rosa);
-  color: var(--branco);
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #9e626c;
-}
-
-@media (max-width: 600px) {
-  main {
-    margin: 15px auto;
-    padding: 12px;
-  }
-
-  header {
-    padding: 25px 15px;
-  }
-
-  h1 {
-    font-size: 26px;
-  }
-
-  section {
-    padding: 18px;
-  }
-}

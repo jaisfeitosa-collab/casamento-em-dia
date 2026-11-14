@@ -1,34 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | Casamento em Dia</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-  <main>
-    <h1>Casamento em Dia</h1>
+<body class="pagina-login">
+  <main class="card login-card">
+    <div class="brand-mark" aria-hidden="true">M&amp;G</div>
+    <p class="eyebrow">Casamento em Dia</p>
+    <h1>Bem-vindo!</h1>
     <h2>Acesso administrativo</h2>
-
     <form id="form-login">
-      <label for="pin">Senha administrativa</label>
-
-      <input
-        type="password"
-        id="pin"
-        required
-        autocomplete="current-password"
-      >
-
-      <button type="submit">Entrar</button>
+      <div class="field">
+        <label for="pin">Senha administrativa</label>
+        <input type="password" id="pin" required autocomplete="current-password" placeholder="Digite sua senha">
+      </div>
+      <button class="btn" type="submit">Entrar</button>
     </form>
-
     <p id="mensagem-login" role="status"></p>
   </main>
-
   <script type="module" src="js/login.js"></script>
 </body>
 </html>
+
