@@ -1,13 +1,25 @@
 
 import { supabase } from "./supabase.js";
 
-// Sessão administrativa
+// ========================================
+// SESSÃO ADMINISTRATIVA
+// ========================================
+
 const token = sessionStorage.getItem("admin_token");
 
-// Elementos da página
+// ========================================
+// ELEMENTOS DA PÁGINA
+// ========================================
+
 const lista = document.getElementById("lista-convidados");
 const formulario = document.getElementById("form-convidado");
 const campoNome = document.getElementById("nome");
+
+const campoBusca = document.getElementById("busca-convidado");
+const filtroStatus = document.getElementById("filtro-status");
+
+// Armazena os convidados carregados do Supabase
+let convidados = [];
 
 // Verificar sessão administrativa
 if (!token) {
@@ -16,7 +28,10 @@ if (!token) {
   carregarConvidados();
 }
 
-// Comunicação com a função administrativa
+// ========================================
+// COMUNICAÇÃO COM O SUPABASE
+// ========================================
+
 async function chamarAdmin(metodo, dados = null) {
   const { data, error } = await supabase.functions.invoke(
     "admin-convidados",
@@ -34,54 +49,21 @@ async function chamarAdmin(metodo, dados = null) {
   return data;
 }
 
-// Carregar a lista de convidados
+// ========================================
+// CARREGAR CONVIDADOS
+// ========================================
+
 async function carregarConvidados() {
   lista.textContent = "Carregando convidados...";
 
   try {
     const resultado = await chamarAdmin("GET");
 
-    lista.replaceChildren();
+    convidados = resultado.convidados ?? [];
 
-    if (!resultado.convidados?.length) {
-      lista.textContent = "Nenhum convidado cadastrado.";
-      return;
-    }
+    // Atualiza a lista respeitando os filtros
+    aplicarFiltros();
 
-    for (const convidado of resultado.convidados) {
-      const item = document.createElement("div");
-      item.className = "item-convidado";
-
-      const informacoes = document.createElement("span");
-      informacoes.textContent =
-        `${convidado.nome} — ${convidado.status}`;
-
-      // Botão Editar
-      const botaoEditar = document.createElement("button");
-      botaoEditar.type = "button";
-      botaoEditar.textContent = "Editar";
-      botaoEditar.className = "botao-editar";
-
-      botaoEditar.addEventListener("click", () => {
-        editarConvidado(convidado);
-      });
-
-      // Botão Excluir
-      const botaoExcluir = document.createElement("button");
-      botaoExcluir.type = "button";
-      botaoExcluir.textContent = "Excluir";
-      botaoExcluir.className = "botao-excluir";
-
-      botaoExcluir.addEventListener("click", () => {
-        excluirConvidado(convidado);
-      });
-
-      item.appendChild(informacoes);
-      item.appendChild(botaoEditar);
-      item.appendChild(botaoExcluir);
-
-      lista.appendChild(item);
-    }
   } catch (erro) {
     console.error("Erro ao carregar convidados:", erro);
 
@@ -91,7 +73,107 @@ async function carregarConvidados() {
   }
 }
 
-// Cadastrar um novo convidado
+// ========================================
+// PESQUISA E FILTROS - US09
+// ========================================
+
+function normalizarTexto(texto) {
+  return String(texto ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function aplicarFiltros() {
+  const busca = normalizarTexto(campoBusca.value);
+  const statusSelecionado = filtroStatus.value;
+
+  const convidadosFiltrados = convidados.filter((convidado) => {
+
+    // Pesquisa pelo nome
+    const correspondeNome = normalizarTexto(
+      convidado.nome
+    ).includes(busca);
+
+    // Filtro pelo status
+    const correspondeStatus =
+      statusSelecionado === "Todos" ||
+      convidado.status === statusSelecionado;
+
+    return correspondeNome && correspondeStatus;
+  });
+
+  renderizarConvidados(convidadosFiltrados);
+}
+
+// Atualizar resultados enquanto o usuário digita
+campoBusca.addEventListener("input", aplicarFiltros);
+
+// Atualizar resultados quando o status mudar
+filtroStatus.addEventListener("change", aplicarFiltros);
+
+// ========================================
+// EXIBIR CONVIDADOS NA TELA
+// ========================================
+
+function renderizarConvidados(convidadosFiltrados) {
+  lista.replaceChildren();
+
+  if (convidados.length === 0) {
+    lista.textContent = "Nenhum convidado cadastrado.";
+    return;
+  }
+
+  if (convidadosFiltrados.length === 0) {
+    lista.textContent =
+      "Nenhum convidado encontrado para os filtros selecionados.";
+    return;
+  }
+
+  for (const convidado of convidadosFiltrados) {
+
+    const item = document.createElement("div");
+    item.className = "item-convidado";
+
+    // Informações do convidado
+    const informacoes = document.createElement("span");
+
+    informacoes.textContent =
+      `${convidado.nome} — ${convidado.status}`;
+
+    // Botão Editar
+    const botaoEditar = document.createElement("button");
+    botaoEditar.type = "button";
+    botaoEditar.textContent = "Editar";
+    botaoEditar.className = "botao-editar";
+
+    botaoEditar.addEventListener("click", () => {
+      editarConvidado(convidado);
+    });
+
+    // Botão Excluir
+    const botaoExcluir = document.createElement("button");
+    botaoExcluir.type = "button";
+    botaoExcluir.textContent = "Excluir";
+    botaoExcluir.className = "botao-excluir";
+
+    botaoExcluir.addEventListener("click", () => {
+      excluirConvidado(convidado);
+    });
+
+    item.appendChild(informacoes);
+    item.appendChild(botaoEditar);
+    item.appendChild(botaoExcluir);
+
+    lista.appendChild(item);
+  }
+}
+
+// ========================================
+// CADASTRAR CONVIDADO - US01
+// ========================================
+
 formulario.addEventListener("submit", async (evento) => {
   evento.preventDefault();
 
@@ -124,6 +206,7 @@ formulario.addEventListener("submit", async (evento) => {
     await carregarConvidados();
 
     alert("Convidado cadastrado com sucesso!");
+
   } catch (erro) {
     console.error("Erro ao cadastrar convidado:", erro);
 
@@ -131,6 +214,7 @@ formulario.addEventListener("submit", async (evento) => {
       "Não foi possível cadastrar o convidado. " +
       "Verifique sua sessão e tente novamente."
     );
+
   } finally {
     if (botao) {
       botao.disabled = false;
@@ -139,8 +223,12 @@ formulario.addEventListener("submit", async (evento) => {
   }
 });
 
-// Editar um convidado existente
+// ========================================
+// EDITAR CONVIDADO - US02
+// ========================================
+
 async function editarConvidado(convidado) {
+
   const novoNome = prompt(
     "Digite o novo nome do convidado:",
     convidado.nome
@@ -172,6 +260,7 @@ async function editarConvidado(convidado) {
     await carregarConvidados();
 
     alert("Convidado atualizado com sucesso!");
+
   } catch (erro) {
     console.error("Erro ao editar convidado:", erro);
 
@@ -182,8 +271,12 @@ async function editarConvidado(convidado) {
   }
 }
 
-// Excluir um convidado
+// ========================================
+// EXCLUIR CONVIDADO - US03
+// ========================================
+
 async function excluirConvidado(convidado) {
+
   const confirmar = confirm(
     `Tem certeza que deseja excluir "${convidado.nome}"?`
   );
@@ -198,6 +291,7 @@ async function excluirConvidado(convidado) {
     await carregarConvidados();
 
     alert("Convidado excluído com sucesso!");
+
   } catch (erro) {
     console.error("Erro ao excluir convidado:", erro);
 
@@ -206,4 +300,4 @@ async function excluirConvidado(convidado) {
       "Verifique sua sessão e tente novamente."
     );
   }
-} 
+}
