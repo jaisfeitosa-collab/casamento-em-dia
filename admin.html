@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,7 +7,9 @@
   <title>Painel Administrativo | Casamento em Dia</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body class="pagina-admin">
+
   <header class="admin-topbar">
     <div class="admin-topbar-inner">
       <div>
@@ -18,39 +21,113 @@
   </header>
 
   <main class="admin-main">
+
     <div class="admin-heading">
       <p class="eyebrow">Área do organizador</p>
       <h2>Painel administrativo</h2>
       <p>Acompanhe os convidados e organize as confirmações do evento.</p>
     </div>
 
+    <!-- Indicadores -->
     <section class="stats-grid" aria-label="Indicadores de convidados">
-      <article class="card stat-card"><span class="stat-label">Total de convidados</span><strong class="stat-value">—</strong><span class="help-text">Aguardando dados</span></article>
-      <article class="card stat-card"><span class="stat-label">Confirmados</span><strong class="stat-value">—</strong><span class="help-text">Aguardando dados</span></article>
-      <article class="card stat-card"><span class="stat-label">Pendentes</span><strong class="stat-value">—</strong><span class="help-text">Aguardando dados</span></article>
+
+      <article class="card stat-card">
+        <span class="stat-label">Total de convidados</span>
+        <strong class="stat-value">—</strong>
+        <span class="help-text">Aguardando dados</span>
+      </article>
+
+      <article class="card stat-card">
+        <span class="stat-label">Confirmados</span>
+        <strong class="stat-value">—</strong>
+        <span class="help-text">Aguardando dados</span>
+      </article>
+
+      <article class="card stat-card">
+        <span class="stat-label">Pendentes</span>
+        <strong class="stat-value">—</strong>
+        <span class="help-text">Aguardando dados</span>
+      </article>
+
     </section>
 
     <div class="admin-grid">
+
+      <!-- Cadastro de convidados -->
       <section class="card admin-section">
+
         <h3>Cadastrar convidado</h3>
+
         <form id="form-convidado">
+
           <div class="field">
             <label for="nome">Nome do convidado</label>
-            <input type="text" id="nome" name="nome" placeholder="Ex.: Ana Souza" required>
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder="Ex.: Ana Souza"
+              maxlength="150"
+              required
+            >
           </div>
-          <button class="btn" type="submit">Cadastrar convidado</button>
+
+          <button class="btn" type="submit">
+            Cadastrar convidado
+          </button>
+
         </form>
-        <p class="admin-note">O cadastro será habilitado quando a função de envio estiver integrada ao sistema.</p>
+
+        <p class="admin-note">
+          Cadastre os convidados para organizar e acompanhar suas confirmações.
+        </p>
+
       </section>
 
+      <!-- Lista de convidados -->
       <section class="card admin-section">
+
         <h3>Lista de convidados</h3>
-        <div id="lista-convidados"><p>Nenhum convidado cadastrado.</p></div>
+
+        <!-- Pesquisa por nome -->
+        <div class="field">
+          <label for="busca-convidado">
+            Pesquisar convidado
+          </label>
+
+          <input
+            type="search"
+            id="busca-convidado"
+            placeholder="Digite o nome do convidado"
+          >
+        </div>
+
+        <!-- Filtro por status -->
+        <div class="field">
+          <label for="filtro-status">
+            Filtrar por status
+          </label>
+
+          <select id="filtro-status">
+            <option value="Todos">Todos</option>
+            <option value="Pendente">Pendentes</option>
+            <option value="Confirmado">Confirmados</option>
+            <option value="Não comparecerá">Não comparecerão</option>
+          </select>
+        </div>
+
+        <!-- Resultado da lista -->
+        <div id="lista-convidados">
+          <p>Nenhum convidado cadastrado.</p>
+        </div>
+
       </section>
+
     </div>
+
   </main>
 
   <script type="module" src="js/admin.js"></script>
+
 </body>
 </html>
-
