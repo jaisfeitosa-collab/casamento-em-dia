@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,39 +10,72 @@
 </head>
 <body>
   <main class="rsvp">
-    <a class="logo" href="convite.html" aria-label="Meu Coração"><img src="img/logo.png" alt="meu♥"></a>
+    <a class="logo" href="convite.html" aria-label="Meu Coração">
+      <img src="img/logo.png" alt="meu♥">
+    </a>
 
     <h1>Confirme sua presença</h1>
-    <p class="intro">Por favor, informe se você poderá comparecer ao nosso casamento</p>
+    <p class="intro">
+      Por favor, informe se você poderá comparecer ao nosso casamento
+    </p>
 
-    <!-- Convidado identificado pelo token do link -->
     <p id="nome-convidado" class="convite-de oculto"></p>
 
     <section class="cartao-rsvp">
-      <!-- Convite não encontrado / token ausente -->
       <div id="erro-convite" class="oculto">
         <h2>Convite não encontrado</h2>
-        <p class="mensagem erro">Confira o link que você recebeu ou fale com os noivos.</p>
+        <p class="mensagem erro">
+          Confira o link que você recebeu ou fale com os noivos.
+        </p>
       </div>
 
       <form id="form-rsvp" class="oculto" novalidate>
         <p id="resposta-atual" class="mensagem oculto"></p>
 
         <h2>Você poderá comparecer?</h2>
+
         <div class="opcoes" role="group" aria-label="Presença">
-          <button type="button" id="opcao-sim" class="opcao" data-status="confirmado">
-            <i class="ic ic-check-c"></i> Sim, estarei presente!
+          <button
+            type="button"
+            id="opcao-sim"
+            class="opcao"
+            data-status="confirmado">
+            <i class="ic ic-check-c"></i>
+            Sim, estarei presente!
           </button>
-          <button type="button" id="opcao-nao" class="opcao" data-status="ausente">
-            <i class="ic ic-x-c"></i> Infelizmente, não poderei ir.
+
+          <button
+            type="button"
+            id="opcao-nao"
+            class="opcao"
+            data-status="ausente">
+            <i class="ic ic-x-c"></i>
+            Infelizmente, não poderei ir.
           </button>
         </div>
+
+        <!-- Campo de acompanhantes -->
+        <div id="bloco-acompanhantes" class="oculto">
+          <label for="acompanhantes">
+            Quantos acompanhantes você levará?
+          </label>
+
+          <select id="acompanhantes" name="acompanhantes">
+            <option value="0">Nenhum acompanhante</option>
+            <option value="1">1 acompanhante</option>
+            <option value="2">2 acompanhantes</option>
+            <option value="3">3 acompanhantes</option>
+          </select>
 
           <p id="limite-acompanhantes" class="limite"></p>
         </div>
 
         <p id="mensagem" class="mensagem" role="status"></p>
-        <button type="submit" id="enviar" class="botao">Confirmar resposta <i class="ic ic-chev"></i></button>
+
+        <button type="submit" id="enviar" class="botao">
+          Confirmar resposta
+          <i class="ic ic-chev"></i>
+        </button>
       </form>
     </section>
   </main>
