@@ -16,6 +16,8 @@ const CONVIDADOS_MOCK = {
 
 const formulario = document.getElementById("form-rsvp");
 const mensagem = document.getElementById("rsvp-mensagem");
+const boasVindas = document.getElementById("boas-vindas");
+const btnComecar = document.getElementById("btn-comecar");
 const campoNome = document.getElementById("nome-convidado");
 const respostaAtual = document.getElementById("rsvp-resposta-atual");
 const botao = document.getElementById("btn-enviar");
@@ -81,11 +83,16 @@ async function iniciar() {
     campoNome.textContent = convite.nome;
     mostrarStatusAtual(convite.status);
     mensagem.hidden = true;
-    formulario.hidden = false;
+    boasVindas.hidden = false;
   } catch {
     mostrarMensagem("Não foi possível carregar o convite. Tente novamente mais tarde.");
   }
 }
+
+btnComecar.addEventListener("click", () => {
+  boasVindas.hidden = true;
+  formulario.hidden = false;
+});
 
 formulario.addEventListener("submit", async (evento) => {
   evento.preventDefault();
@@ -110,7 +117,7 @@ formulario.addEventListener("submit", async (evento) => {
     mostrarMensagem("Erro de conexão. Tente novamente.");
   } finally {
     botao.disabled = false;
-    botao.textContent = "Enviar confirmação";
+    botao.innerHTML = 'Confirmar resposta <span aria-hidden="true">›</span>';
   }
 });
 
