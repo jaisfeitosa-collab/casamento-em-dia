@@ -1,50 +1,190 @@
 
-      </section>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel | Meu Coração</title>
+  <link rel="preload" href="fonts/playfair-display-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/meu-coracao.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="lateral">
+      <a class="logo" href="painel.html" aria-label="Meu Coração">
+        <img src="img/logo-branco.png" alt="meu♥">
+      </a>
 
-      <!-- CONTROLE DE ENVIO DOS CONVITES -->
-      <section class="bloco controle-convites"
-        aria-label="Controle de envio dos convites"
-        style="margin-top: 24px; margin-bottom: 24px;">
+      <nav>
+        <a class="ativo" href="painel.html">
+          <i class="ic ic-dash"></i> Dashboard
+        </a>
+        <a href="convidados.html">
+          <i class="ic ic-users"></i> Convidados
+        </a>
+        <a href="#">
+          <i class="ic ic-report"></i> Relatórios
+        </a>
+        <a href="#">
+          <i class="ic ic-gear"></i> Configurações
+        </a>
+      </nav>
 
-        <h3>Controle de envio dos convites</h3>
+      <a class="sair" href="login.html" id="btn-sair">
+        <i class="ic ic-sair"></i> Sair
+      </a>
+    </aside>
 
-        <div style="
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: 16px;
-          margin-top: 18px;
-        ">
+    <main class="conteudo painel">
+      <div class="topo">
+        <span class="seletor-data">
+          <i class="ic ic-cal"></i>
+          <span id="data-hoje"></span>
+          <i class="ic ic-chev-b"></i>
+        </span>
+        <span class="avatar"></span>
+      </div>
 
-          <div style="
-            padding: 20px;
-            border: 1px solid #eccfc9;
-            border-radius: 10px;
-            text-align: center;
-          ">
-            <div style="color: #b86d76; margin-bottom: 8px;">
-              Convites enviados
-            </div>
-            <strong id="ind-enviados" style="font-size: 30px;">
-              —
-            </strong>
-          </div>
+      <h1>Olá, Beatriz!</h1>
+      <p class="legenda">
+        Acompanhe as confirmações do seu casamento em tempo real
+      </p>
+      <p class="aviso-admin">
+        Área do administrador: aqui você vê quem confirmou presença.
+      </p>
 
-          <div style="
-            padding: 20px;
-            border: 1px solid #eccfc9;
-            border-radius: 10px;
-            text-align: center;
-          ">
-            <div style="color: #b86d76; margin-bottom: 8px;">
-              Convites não enviados
-            </div>
-            <strong id="ind-nao-enviados" style="font-size: 30px;">
-              —
-            </strong>
-          </div>
+      <!-- INDICADORES DE PRESENÇA -->
+      <section class="cartoes" aria-label="Indicadores">
+        <div class="numero">
+          <i class="ic ic-users"></i>
+          <strong id="ind-total">—</strong>
+          Convidados
+        </div>
 
+        <div class="numero">
+          <i class="ic ic-check-c"></i>
+          <strong id="ind-confirmados">—</strong>
+          Confirmados
+        </div>
+
+        <div class="numero">
+          <i class="ic ic-alert-c"></i>
+          <strong id="ind-pendentes">—</strong>
+          Pendentes
+        </div>
+
+        <div class="numero">
+          <i class="ic ic-x-c"></i>
+          <strong id="ind-ausentes">—</strong>
+          Não irão
         </div>
       </section>
 
+      <!-- CONTROLE DE ENVIO DOS CONVITES -->
+      <section
+        class="bloco controle-convites"
+        aria-label="Controle de envio dos convites"
+        style="margin-top:24px; margin-bottom:24px;"
+      >
+        <h3>Controle de envio dos convites</h3>
+
+        <div style="
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+          gap:16px;
+          margin-top:18px;
+        ">
+          <div style="
+            padding:20px;
+            border:1px solid #eccfc9;
+            border-radius:10px;
+            text-align:center;
+          ">
+            <div style="color:#b86d76; margin-bottom:8px;">
+              Convites enviados
+            </div>
+            <strong id="ind-enviados" style="font-size:30px;">
+              —
+            </strong>
+          </div>
+
+          <div style="
+            padding:20px;
+            border:1px solid #eccfc9;
+            border-radius:10px;
+            text-align:center;
+          ">
+            <div style="color:#b86d76; margin-bottom:8px;">
+              Convites não enviados
+            </div>
+            <strong id="ind-nao-enviados" style="font-size:30px;">
+              —
+            </strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- GRÁFICO E RESUMO -->
       <section class="linha2">
         <div class="bloco grafico">
+          <h3>Status de confirmações</h3>
+
+          <div class="grafico-corpo">
+            <div
+              class="rosca"
+              id="rosca"
+              role="img"
+              aria-label="Gráfico de confirmações"
+            ></div>
+
+            <div class="legenda-grafico">
+              <span>
+                <i style="background:#b86d76"></i>
+                Confirmados
+              </span>
+              <span>
+                <i style="background:#eccfc9"></i>
+                Pendentes
+              </span>
+              <span>
+                <i style="background:#faf0ef"></i>
+                Não irão
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bloco resumo">
+          <h3>Resumo rápido</h3>
+
+          <div class="item">
+            <i class="ic ic-pessoas"></i>
+            <div>
+              <small>Convidados</small>
+              <strong id="res-total">—</strong>
+            </div>
+          </div>
+
+          <div class="item">
+            <i class="ic ic-moedas"></i>
+            <div>
+              <small>Total previsto de pessoas</small>
+              <strong id="res-previsto">—</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LISTA DE CONFIRMADOS -->
+      <section class="bloco quem-confirmou">
+        <h3>Quem confirmou presença</h3>
+        <ul id="lista-confirmados">
+          <li>Carregando convidados...</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/painel.js"></script>
+</body>
+</html>
