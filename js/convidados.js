@@ -127,16 +127,16 @@ function enviarConviteWhatsApp(convidado) {
 
  
 const mensagem = [
-  `Olá, ${convidado.nome}!❤️`,
+  `Olá, ${convidado.nome}!`,
   "",
-  "Você está convidado(a) para celebrar conosco um momento muito especial: nosso casamento!❤️",
+  "Você está convidado(a) para celebrar conosco um momento muito especial: nosso casamento!",
   "",
   "Preparamos um convite especial para você.",
   "",
   "Acesse seu convite e confirme sua presença:",
   link.href,
   "",
-  "Esperamos por você!❤️"
+  "Esperamos por você!"
 ].join("\n");
 
   const urlWhatsApp =
