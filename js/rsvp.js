@@ -6,7 +6,7 @@ import { supabase } from "./supabase.js";
 
 // Enquanto a função do Supabase não existir, deixe true (usa dados fictícios).
 // Quando a função "rsvp-convidado" estiver publicada, troque para false.
-USAR_MOCK = false;
+const USAR_MOCK = true;
 
 // Tokens fictícios para testar: index.html?token=teste-ana
 const CONVIDADOS_MOCK = {
