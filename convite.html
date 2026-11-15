@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirme sua presença | Meu Coração</title>
+  <link rel="preload" href="fonts/playfair-display-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/meu-coracao.css">
+</head>
+<body>
+  <main class="capa">
+    <div class="bloco-capa">
+      <a class="logo" href="convite.html" aria-label="Meu Coração"><img src="img/logo.png" alt="meu♥"></a>
+
+      <section class="cartao-convite">
+        <h1>Confirme sua presença</h1>
+        <p class="sub">Sua presença tornará nosso dia ainda mais especial!</p>
+
+        <div class="info-evento">
+          <div><span class="icone-rosa"><i class="ic ic-pin"></i></span> <span id="data-evento">Terça, 17 de novembro de 2026</span></div>
+          <div><span class="icone-rosa"><i class="ic ic-cal"></i></span> <span id="local-evento">Espaço Andrade</span></div>
+        </div>
+
+        <!-- O link leva o token do convite para a tela de RSVP -->
+        <a id="botao-confirmar" class="botao" href="rsvp.html">Confirmar presença <i class="ic ic-chev"></i></a>
+        <p class="login">Já tem uma conta? <a href="login.html">Login</a></p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Repassa ?token=... para a tela de RSVP
+    var token = new URLSearchParams(location.search).get("token");
+    if (token) {
+      document.getElementById("botao-confirmar").href = "rsvp.html?token=" + encodeURIComponent(token);
+    }
+  </script>
+</body>
+</html>

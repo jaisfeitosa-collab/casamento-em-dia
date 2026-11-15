@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirme sua presença | Meu Coração</title>
+  <link rel="preload" href="fonts/playfair-display-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/meu-coracao.css">
+</head>
+<body>
+  <main class="rsvp">
+    <a class="logo" href="convite.html" aria-label="Meu Coração"><img src="img/logo.png" alt="meu♥"></a>
+
+    <h1>Confirme sua presença</h1>
+    <p class="intro">Por favor, informe se você poderá comparecer ao nosso casamento</p>
+
+    <!-- Convidado identificado pelo token do link -->
+    <p id="nome-convidado" class="convite-de oculto"></p>
+
+    <section class="cartao-rsvp">
+      <!-- Convite não encontrado / token ausente -->
+      <div id="erro-convite" class="oculto">
+        <h2>Convite não encontrado</h2>
+        <p class="mensagem erro">Confira o link que você recebeu ou fale com os noivos.</p>
+      </div>
+
+      <form id="form-rsvp" class="oculto" novalidate>
+        <p id="resposta-atual" class="mensagem oculto"></p>
+
+        <h2>Você poderá comparecer?</h2>
+        <div class="opcoes" role="group" aria-label="Presença">
+          <button type="button" id="opcao-sim" class="opcao" data-status="confirmado">
+            <i class="ic ic-check-c"></i> Sim, estarei presente!
+          </button>
+          <button type="button" id="opcao-nao" class="opcao" data-status="ausente">
+            <i class="ic ic-x-c"></i> Infelizmente, não poderei ir.
+          </button>
+        </div>
+
+        <div id="bloco-acompanhantes">
+          <h2>Quantos acompanhantes estarão presentes?</h2>
+          <div class="contador">
+            <button type="button" id="menos" aria-label="Diminuir"><i class="ic ic-menos"></i></button>
+            <output id="qtd-acompanhantes">0</output>
+            <button type="button" id="mais" aria-label="Aumentar"><i class="ic ic-mais"></i></button>
+          </div>
+          <p id="limite-acompanhantes" class="limite"></p>
+        </div>
+
+        <p id="mensagem" class="mensagem" role="status"></p>
+        <button type="submit" id="enviar" class="botao">Confirmar resposta <i class="ic ic-chev"></i></button>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/dados-mock.js"></script>
+  <script src="js/rsvp.js"></script>
+</body>
+</html>
