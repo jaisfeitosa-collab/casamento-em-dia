@@ -26,33 +26,24 @@
       <h2 id="rsvp-title">Confirme sua presença</h2>
       <p class="muted">Por favor, informe se poderá celebrar conosco.</p>
 
-      <!-- Protótipo visual: a integração do RSVP será implementada em etapa própria. -->
-      <form class="rsvp-form" id="form-rsvp">
-        <div class="field">
-          <label for="nome-convidado">Nome do convidado</label>
-          <input id="nome-convidado" name="nome" type="text" placeholder="Digite seu nome" autocomplete="name" required>
-        </div>
+      <p id="rsvp-mensagem" class="help-text" role="status" aria-live="polite">Carregando seu convite...</p>
+
+      <form class="rsvp-form" id="form-rsvp" hidden>
+        <p id="rsvp-saudacao"><strong>Convidado(a): <span id="nome-convidado"></span></strong></p>
+        <p id="rsvp-resposta-atual" class="help-text" hidden></p>
         <div class="field">
           <label>Você poderá comparecer?</label>
           <div class="choice-grid">
-            <label class="choice"><input type="radio" name="presenca" value="confirmado" required> Sim, estarei presente!</label>
-            <label class="choice"><input type="radio" name="presenca" value="ausente"> Infelizmente, não poderei ir.</label>
+            <label class="choice"><input type="radio" name="presenca" value="Confirmado" required> Sim, estarei presente!</label>
+            <label class="choice"><input type="radio" name="presenca" value="Não comparecerá"> Infelizmente, não poderei ir.</label>
           </div>
+          <span class="help-text">Este convite é individual, sem acompanhantes.</span>
         </div>
-        <div class="field">
-          <label for="acompanhantes">Quantidade de acompanhantes</label>
-          <select id="acompanhantes" name="acompanhantes">
-            <option value="0">Nenhum acompanhante</option>
-            <option value="1">1 acompanhante</option>
-            <option value="2">2 acompanhantes</option>
-          </select>
-          <span class="help-text">A quantidade permitida deverá ser definida pelo organizador do evento.</span>
-        </div>
-        <button class="btn" type="button" onclick="document.getElementById('aviso-prototipo').hidden = false">Enviar confirmação</button>
-        <p id="aviso-prototipo" class="help-text" role="status" hidden>Esta é uma demonstração visual. O envio da resposta será conectado ao sistema na próxima etapa.</p>
+        <button class="btn" type="submit" id="btn-enviar">Enviar confirmação</button>
       </form>
     </section>
     <footer class="invitation-footer">Com amor, Marina & Gabriel · Convite demonstrativo do Casamento em Dia</footer>
   </main>
+  <script type="module" src="js/rsvp.js"></script>
 </body>
 </html>
