@@ -126,18 +126,26 @@ function enviarConviteWhatsApp(convidado) {
   );
 
  
+
 const mensagem = [
-  `Olá, ${convidado.nome}!`,
+  `Olá, *${convidado.nome}*! \u{1F48C}`,
   "",
-  "Você está convidado(a) para celebrar conosco um momento muito especial: nosso casamento!",
+  "Somos da equipe de organização do *Casamento em Dia* e temos o prazer de encaminhar um convite muito especial para você! \u{1F48D}\u2728",
   "",
-  "Preparamos um convite especial para você.",
+  "Você foi convidado(a) para celebrar a união de um casal que está preparando esse momento com muito carinho.",
   "",
-  "Acesse seu convite e confirme sua presença:",
-  link.href,
+  "\u{1F48C} *Seu convite é individual e está disponível no link abaixo:*",
   "",
-  "Esperamos por você!"
+  "\u{1F517} " + link.href,
+  "",
+  "Pedimos que acesse o convite e registre sua resposta para que possamos organizar todos os detalhes da celebração.",
+  "",
+  "Agradecemos sua atenção e esperamos contar com sua presença nesse dia tão especial! \u2764\uFE0F",
+  "",
+  "*Atenciosamente,*",
+  "*Equipe de Organização | Casamento em Dia*"
 ].join("\n");
+
 
   const urlWhatsApp =
     "https://wa.me/" +
