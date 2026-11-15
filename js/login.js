@@ -33,7 +33,7 @@ formulario.addEventListener("submit", async (evento) => {
     sessionStorage.setItem("admin_token", data.token);
 
     formulario.reset();
-    window.location.href = "admin.html";
+    window.location.href = "painel.html";
 
   } catch {
     mensagem.textContent =
