@@ -54,20 +54,60 @@
           </button>
         </div>
 
-        <!-- Campo de acompanhantes -->
-        <div id="bloco-acompanhantes" class="oculto">
-          <label for="acompanhantes">
+        <!-- Contador de acompanhantes -->
+        <div
+          id="bloco-acompanhantes"
+          class="acompanhantes-box oculto">
+
+          <label
+            id="titulo-acompanhantes"
+            for="acompanhantes">
             Quantos acompanhantes você levará?
           </label>
 
-          <select id="acompanhantes" name="acompanhantes">
+          <div class="contador-acompanhantes">
+            <button
+              type="button"
+              id="diminuir-acompanhantes"
+              class="contador-botao"
+              aria-label="Diminuir acompanhantes">
+              −
+            </button>
+
+            <output
+              id="numero-acompanhantes"
+              for="diminuir-acompanhantes aumentar-acompanhantes"
+              aria-live="polite">
+              0
+            </output>
+
+            <button
+              type="button"
+              id="aumentar-acompanhantes"
+              class="contador-botao"
+              aria-label="Aumentar acompanhantes">
+              +
+            </button>
+          </div>
+
+          <!-- Campo mantido para integração com o JavaScript -->
+          <select
+            id="acompanhantes"
+            name="acompanhantes"
+            class="oculto"
+            aria-label="Quantidade de acompanhantes"
+            tabindex="-1">
             <option value="0">Nenhum acompanhante</option>
-            <option value="1">1 acompanhante</option>
-            <option value="2">2 acompanhantes</option>
-            <option value="3">3 acompanhantes</option>
           </select>
 
-          <p id="limite-acompanhantes" class="limite"></p>
+          <p
+            id="limite-acompanhantes"
+            class="limite-acompanhantes">
+          </p>
+
+          <p id="total-pessoas" class="total-pessoas">
+            Total de pessoas no convite: 1
+          </p>
         </div>
 
         <p id="mensagem" class="mensagem" role="status"></p>
