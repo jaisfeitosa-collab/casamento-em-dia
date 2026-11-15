@@ -312,9 +312,12 @@ function desenhar() {
     );
 
     whatsapp.innerHTML =
-      '<i class="ic ic-send"></i>';
+     
+whatsapp.textContent = "✉";
+whatsapp.style.color = "#258b54";
+whatsapp.style.fontSize = "18px";
+whatsapp.style.cursor = "pointer";
 
-    whatsapp.style.color = "#258b54";
 
     whatsapp.addEventListener("click", () => {
       enviarConviteWhatsApp(convidado);
