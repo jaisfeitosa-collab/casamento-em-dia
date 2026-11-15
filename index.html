@@ -393,3 +393,398 @@
   carregarConvite();
 
 })();
+
+/*
+ * Casamento em Dia — RSVP do convidado
+ * US04, US05, US06 e US08
+ *
+ * Integração real com Supabase.
+ * Compatível com o index.html de Isadora.
+ * Convites individuais, sem acompanhantes.
+ */
+
+(function () {
+  "use strict";
+
+  // ==========================================
+  // CONFIGURAÇÃO
+  // ==========================================
+
+  const SUPABASE_URL =
+    "https://hlwctlmrfubbqoohzird.supabase.co";
+
+  const FUNCAO_RSVP =
+    SUPABASE_URL + "/functions/v1/rsvp-convidado";
+
+  const PRAZO_ALTERACAO =
+    "2026-11-21T23:59:59-03:00";
+
+  // ==========================================
+  // ELEMENTOS DO HTML
+  // ==========================================
+
+  const el = (id) => document.getElementById(id);
+
+  const mensagem = el("rsvp-mensagem");
+  const boasVindas = el("boas-vindas");
+  const nomeConvidado = el("nome-convidado");
+  const botaoComecar = el("btn-comecar");
+
+  const form = el("form-rsvp");
+  const botaoEnviar = el("btn-enviar");
+  const respostaAtual = el("rsvp-resposta-atual");
+
+  const radios = document.querySelectorAll(
+    'input[name="presenca"]'
+  );
+
+  const token = new URLSearchParams(
+    window.location.search
+  ).get("token")?.trim();
+
+  let statusSalvo = null;
+  let prazoServidorEncerrado = false;
+  let enviando = false;
+  let carregado = false;
+
+  // ==========================================
+  // MENSAGENS
+  // ==========================================
+
+  function mostrarMensagem(texto, tipo = "") {
+    mensagem.textContent = texto || "";
+    mensagem.className =
+      "rsvp-mensagem" + (tipo ? " " + tipo : "");
+
+    mensagem.hidden = !texto;
+  }
+
+  // ==========================================
+  // PRAZO
+  // ==========================================
+
+  function prazoEncerrado() {
+    return (
+      prazoServidorEncerrado ||
+      Date.now() > Date.parse(PRAZO_ALTERACAO)
+    );
+  }
+
+  function atualizarPrazo() {
+    const encerrado = prazoEncerrado();
+
+    botaoEnviar.disabled = encerrado || enviando;
+
+    radios.forEach(function (radio) {
+      radio.disabled = encerrado || enviando;
+    });
+
+    if (encerrado) {
+      mostrarMensagem(
+        "O prazo para confirmar ou alterar a presença terminou.",
+        "erro"
+      );
+    }
+  }
+
+  // ==========================================
+  // COMUNICAÇÃO COM SUPABASE
+  // ==========================================
+
+  async function chamarRSVP(dados) {
+    let resposta;
+
+    try {
+      resposta = await fetch(FUNCAO_RSVP, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+      });
+    } catch (erro) {
+      console.error("Erro de conexão:", erro);
+
+      throw new Error(
+        "Não foi possível conectar ao servidor. Verifique sua conexão."
+      );
+    }
+
+    let resultado;
+
+    try {
+      resultado = await resposta.json();
+    } catch {
+      throw new Error(
+        "O servidor retornou uma resposta inválida."
+      );
+    }
+
+    if (!resposta.ok) {
+      throw new Error(
+        resultado.erro ||
+        resultado.message ||
+        "Não foi possível concluir a operação."
+      );
+    }
+
+    return resultado;
+  }
+
+  async function consultarConvite() {
+    return chamarRSVP({
+      acao: "consultar",
+      token: token
+    });
+  }
+
+  async function salvarResposta(status) {
+    return chamarRSVP({
+      acao: "responder",
+      token: token,
+      status: status,
+      acompanhantes: 0
+    });
+  }
+
+  // ==========================================
+  // RESPOSTA ATUAL
+  // ==========================================
+
+  function atualizarRespostaAtual() {
+    if (!statusSalvo) {
+      respostaAtual.hidden = true;
+      return;
+    }
+
+    respostaAtual.hidden = false;
+
+    if (statusSalvo === "Confirmado") {
+      respostaAtual.textContent =
+        "Sua resposta atual: presença confirmada.";
+    } else if (
+      statusSalvo === "Não comparecerá"
+    ) {
+      respostaAtual.textContent =
+        "Sua resposta atual: você não poderá comparecer.";
+    }
+  }
+
+  function selecionarResposta(status) {
+    radios.forEach(function (radio) {
+      radio.checked = radio.value === status;
+    });
+  }
+
+  // ==========================================
+  // CARREGAR CONVITE
+  // ==========================================
+
+  async function carregarConvite() {
+    boasVindas.hidden = true;
+    form.hidden = true;
+
+    if (!token) {
+      mostrarMensagem(
+        "Este link não contém um convite válido.",
+        "erro"
+      );
+      return;
+    }
+
+    mostrarMensagem("Carregando seu convite...");
+
+    try {
+      const convidado = await consultarConvite();
+
+      if (!convidado || !convidado.nome) {
+        throw new Error(
+          "Convite não encontrado."
+        );
+      }
+
+      // Nome do convidado
+
+      nomeConvidado.textContent = convidado.nome;
+
+      // Status salvo no banco
+
+      if (
+        convidado.status === "Confirmado" ||
+        convidado.status === "Não comparecerá"
+      ) {
+        statusSalvo = convidado.status;
+      } else {
+        statusSalvo = null;
+      }
+
+      // Prazo informado pelo servidor
+
+      prazoServidorEncerrado =
+        convidado.prazo_encerrado === true;
+
+      atualizarRespostaAtual();
+
+      if (statusSalvo) {
+        selecionarResposta(statusSalvo);
+      }
+
+      // Mostrar boas-vindas
+
+      boasVindas.hidden = false;
+      form.hidden = true;
+
+      carregado = true;
+
+      mostrarMensagem("");
+
+      console.log(
+        "Convite carregado com sucesso."
+      );
+
+    } catch (erro) {
+      console.error(
+        "Erro ao carregar convite:",
+        erro
+      );
+
+      boasVindas.hidden = true;
+      form.hidden = true;
+
+      mostrarMensagem(
+        erro.message ||
+        "Não foi possível carregar o convite.",
+        "erro"
+      );
+    }
+  }
+
+  // ==========================================
+  // BOTÃO COMEÇAR
+  // ==========================================
+
+  botaoComecar.addEventListener(
+    "click",
+    function () {
+      if (!carregado) return;
+
+      boasVindas.hidden = true;
+      form.hidden = false;
+
+      atualizarRespostaAtual();
+      atualizarPrazo();
+
+      if (!prazoEncerrado()) {
+        mostrarMensagem("");
+      }
+    }
+  );
+
+  // ==========================================
+  // ENVIAR RESPOSTA
+  // ==========================================
+
+  form.addEventListener(
+    "submit",
+    async function (evento) {
+      evento.preventDefault();
+
+      if (enviando || !carregado) {
+        return;
+      }
+
+      if (prazoEncerrado()) {
+        mostrarMensagem(
+          "O prazo para confirmar ou alterar a presença terminou.",
+          "erro"
+        );
+        return;
+      }
+
+      const selecionado = document.querySelector(
+        'input[name="presenca"]:checked'
+      );
+
+      if (!selecionado) {
+        mostrarMensagem(
+          "Selecione se você poderá comparecer.",
+          "erro"
+        );
+        return;
+      }
+
+      const novoStatus = selecionado.value;
+
+      if (
+        novoStatus !== "Confirmado" &&
+        novoStatus !== "Não comparecerá"
+      ) {
+        mostrarMensagem(
+          "Resposta inválida.",
+          "erro"
+        );
+        return;
+      }
+
+      enviando = true;
+      botaoEnviar.disabled = true;
+
+      mostrarMensagem("Salvando sua resposta...");
+
+      try {
+        const resultado = await salvarResposta(
+          novoStatus
+        );
+
+        if (resultado.salvo !== true) {
+          throw new Error(
+            "O servidor não confirmou o salvamento."
+          );
+        }
+
+        statusSalvo = resultado.status;
+
+        atualizarRespostaAtual();
+
+        if (statusSalvo === "Confirmado") {
+          mostrarMensagem(
+            "Presença confirmada! Obrigado, estamos te esperando.",
+            "ok"
+          );
+        } else {
+          mostrarMensagem(
+            "Resposta registrada. Sentiremos sua falta!",
+            "ok"
+          );
+        }
+
+        console.log(
+          "Resposta registrada com sucesso."
+        );
+
+      } catch (erro) {
+        console.error(
+          "Erro ao salvar resposta:",
+          erro
+        );
+
+        mostrarMensagem(
+          erro.message ||
+          "Não foi possível salvar sua resposta.",
+          "erro"
+        );
+
+      } finally {
+        enviando = false;
+        atualizarPrazo();
+      }
+    }
+  );
+
+  // ==========================================
+  // INICIALIZAÇÃO
+  // ==========================================
+
+  carregarConvite();
+
+})();
