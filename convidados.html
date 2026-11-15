@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,29 +11,64 @@
 <body>
   <div class="layout">
     <aside class="lateral">
-      <a class="logo" href="painel.html" aria-label="Meu Coração"><img src="img/logo-branco.png" alt="meu♥"></a>
+      <a class="logo" href="painel.html" aria-label="Meu Coração">
+        <img src="img/logo-branco.png" alt="meu♥">
+      </a>
+
       <nav>
-        <a href="painel.html"><i class="ic ic-dash"></i> Dashboard</a>
-        <a class="ativo" href="convidados.html"><i class="ic ic-users"></i> Convidados</a>
-        <a href="#"><i class="ic ic-report"></i> Relatórios</a>
-        <a href="#"><i class="ic ic-gear"></i> Configurações</a>
+        <a href="painel.html">
+          <i class="ic ic-dash"></i> Dashboard
+        </a>
+        <a class="ativo" href="convidados.html">
+          <i class="ic ic-users"></i> Convidados
+        </a>
+        <a href="#">
+          <i class="ic ic-report"></i> Relatórios
+        </a>
+        <a href="#">
+          <i class="ic ic-gear"></i> Configurações
+        </a>
       </nav>
-      <a class="sair" href="login.html"><i class="ic ic-sair"></i> Sair</a>
+
+      <!-- LOGOUT -->
+      <a class="sair" href="login.html" id="btn-sair">
+        <i class="ic ic-sair"></i> Sair
+      </a>
     </aside>
 
-    <!-- ÁREA DO ADMINISTRADOR: lista de quem respondeu o convite -->
+    <!-- ÁREA DO ADMINISTRADOR -->
     <main class="conteudo lista-pagina">
       <div class="cabecalho-lista">
         <div>
           <h1>Lista de convidados</h1>
-          <p class="legenda">Gerencie os convidados e acompanhe suas respostas</p>
-          <p class="aviso-admin">Área do administrador: aqui você vê quem confirmou presença.</p>
+          <p class="legenda">
+            Gerencie os convidados e acompanhe suas respostas
+          </p>
+          <p class="aviso-admin">
+            Área do administrador: aqui você vê quem confirmou presença.
+          </p>
         </div>
-        <button class="botao-contorno" id="adicionar" type="button"><i class="ic ic-mais"></i> Adicionar convidado</button>
+
+        <button
+          class="botao-contorno"
+          id="adicionar"
+          type="button"
+        >
+          <i class="ic ic-mais"></i>
+          Adicionar convidado
+        </button>
       </div>
 
       <div class="filtros">
-        <label class="campo"><i class="ic ic-search"></i><input id="busca" type="search" placeholder="Buscar por nome..."></label>
+        <label class="campo">
+          <i class="ic ic-search"></i>
+          <input
+            id="busca"
+            type="search"
+            placeholder="Buscar por nome..."
+          >
+        </label>
+
         <select id="filtro-status" aria-label="Filtrar por status">
           <option value="">Todos os status</option>
           <option value="confirmado">Confirmado</option>
@@ -42,7 +78,15 @@
       </div>
 
       <table>
-        <thead><tr><th style="width:32%">Nome</th><th style="width:37%">Acompanhantes</th><th style="width:19%">Status</th><th>Ação</th></tr></thead>
+        <thead>
+          <tr>
+            <th style="width:32%">Nome</th>
+            <th style="width:37%">Acompanhantes</th>
+            <th style="width:19%">Status</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+
         <tbody id="corpo"></tbody>
       </table>
 
@@ -53,62 +97,139 @@
     </main>
   </div>
 
+  <!-- DADOS SIMULADOS: SERÃO SUBSTITUÍDOS NA INTEGRAÇÃO -->
   <script src="js/dados-mock.js"></script>
+
   <script>
-    // Lê as respostas dos convidados (mock). Jais liga ao Supabase na integração (US01–US03 e US09).
     var convidados = DadosMock.ler();
     var POR_PAGINA = 3;
     var pagina = 1;
-    var rotulo = { confirmado: "Confirmado", pendente: "Pendente", ausente: "Não comparecerá" };
+
+    var rotulo = {
+      confirmado: "Confirmado",
+      pendente: "Pendente",
+      ausente: "Não comparecerá"
+    };
+
     var corpo = document.getElementById("corpo");
 
     function filtrados() {
       var texto = document.getElementById("busca").value.toLowerCase();
       var filtro = document.getElementById("filtro-status").value;
+
       return convidados.filter(function (c) {
-        return c.nome.toLowerCase().indexOf(texto) !== -1 && (!filtro || c.status === filtro);
+        return c.nome.toLowerCase().indexOf(texto) !== -1 &&
+          (!filtro || c.status === filtro);
       });
     }
 
     function desenhar() {
       var todos = filtrados();
       var paginas = Math.max(1, Math.ceil(todos.length / POR_PAGINA));
-      if (pagina > paginas) pagina = paginas;
+
+      if (pagina > paginas) {
+        pagina = paginas;
+      }
+
       var ini = (pagina - 1) * POR_PAGINA;
       var visiveis = todos.slice(ini, ini + POR_PAGINA);
 
       corpo.innerHTML = "";
+
       visiveis.forEach(function (c) {
         var tr = document.createElement("tr");
-        tr.innerHTML = "<td></td><td>+" + c.acompanhantes + "</td>" +
-          '<td><span class="etiqueta ' + c.status + '">' + rotulo[c.status] + "</span></td>" +
-          '<td class="acoes"><button title="Editar"><i class="ic ic-edit"></i></button><button title="Excluir"><i class="ic ic-trash"></i></button></td>';
-        tr.firstChild.textContent = c.nome; // textContent evita injeção de HTML
+
+        tr.innerHTML =
+          "<td></td><td>+" + c.acompanhantes + "</td>" +
+          '<td><span class="etiqueta ' + c.status + '">' +
+          rotulo[c.status] + "</span></td>" +
+          '<td class="acoes">' +
+          '<button title="Editar"><i class="ic ic-edit"></i></button>' +
+          '<button title="Excluir"><i class="ic ic-trash"></i></button>' +
+          "</td>";
+
+        tr.firstChild.textContent = c.nome;
         corpo.appendChild(tr);
       });
 
-      document.getElementById("contagem").textContent = todos.length
-        ? "Mostrando " + (ini + 1) + "-" + (ini + visiveis.length) + " de " + todos.length + " convidados"
-        : "Nenhum convidado encontrado";
+      document.getElementById("contagem").textContent =
+        todos.length
+          ? "Mostrando " + (ini + 1) + "-" +
+            (ini + visiveis.length) +
+            " de " + todos.length + " convidados"
+          : "Nenhum convidado encontrado";
 
       var nav = document.getElementById("paginas");
       nav.innerHTML = "";
+
       function botao(html, alvo, atual, desativado) {
         var b = document.createElement("button");
-        b.type = "button"; b.innerHTML = html;
-        if (atual) b.className = "atual";
-        if (desativado) b.disabled = true;
-        b.addEventListener("click", function () { pagina = alvo; desenhar(); });
+        b.type = "button";
+        b.innerHTML = html;
+
+        if (atual) {
+          b.className = "atual";
+        }
+
+        if (desativado) {
+          b.disabled = true;
+        }
+
+        b.addEventListener("click", function () {
+          pagina = alvo;
+          desenhar();
+        });
+
         nav.appendChild(b);
       }
-      botao('<i class="ic ic-chev" style="transform:scaleX(-1)"></i>', pagina - 1, false, pagina === 1);
-      for (var i = 1; i <= paginas; i++) botao(String(i), i, i === pagina, false);
-      botao('<i class="ic ic-chev"></i>', pagina + 1, false, pagina === paginas);
+
+      botao(
+        '<i class="ic ic-chev" style="transform:scaleX(-1)"></i>',
+        pagina - 1,
+        false,
+        pagina === 1
+      );
+
+      for (var i = 1; i <= paginas; i++) {
+        botao(String(i), i, i === pagina, false);
+      }
+
+      botao(
+        '<i class="ic ic-chev"></i>',
+        pagina + 1,
+        false,
+        pagina === paginas
+      );
     }
 
-    document.getElementById("busca").addEventListener("input", function () { pagina = 1; desenhar(); });
-    document.getElementById("filtro-status").addEventListener("change", function () { pagina = 1; desenhar(); });
+    document.getElementById("busca").addEventListener(
+      "input",
+      function () {
+        pagina = 1;
+        desenhar();
+      }
+    );
+
+    document.getElementById("filtro-status").addEventListener(
+      "change",
+      function () {
+        pagina = 1;
+        desenhar();
+      }
+    );
+
     desenhar();
+
+    // ========================================
+    // LOGOUT ADMINISTRATIVO
+    // ========================================
+
+    document.getElementById("btn-sair").addEventListener(
+      "click",
+      function () {
+        sessionStorage.removeItem("admin_token");
+      }
+    );
   </script>
 </body>
 </html>
