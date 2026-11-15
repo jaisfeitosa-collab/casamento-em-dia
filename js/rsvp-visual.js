@@ -1,9 +1,9 @@
 
 /*
- * CASAMENTO EM DIA
- * RSVP do convidado — integração com Supabase
- * Contador de acompanhantes com botões + e -
- */
+  CASAMENTO EM DIA
+  Confirmação de presença (RSVP)
+  Contador de acompanhantes com + e -
+*/
 
 (function () {
   "use strict";
@@ -12,50 +12,71 @@
     "https://hlwctlmrfubbqoohzird.supabase.co";
 
   const RSVP_URL =
-    SUPABASE_URL + "/functions/v1/rsvp-convidado";
+    `${SUPABASE_URL}/functions/v1/rsvp-convidado`;
 
   const PRAZO_ALTERACAO =
     "2026-11-21T23:59:59-03:00";
 
+  const LIMITE_PADRAO = 3;
+
   const el = (id) => document.getElementById(id);
 
-  // Elementos do formulário
+  // Elementos da página
   const formulario = el("form-rsvp");
   const erroConvite = el("erro-convite");
   const nomeConvidado = el("nome-convidado");
   const respostaAtual = el("resposta-atual");
   const mensagem = el("mensagem");
+
   const botaoSim = el("opcao-sim");
   const botaoNao = el("opcao-nao");
   const botaoEnviar = el("enviar");
 
   // Elementos dos acompanhantes
-  const blocoAcompanhantes = el("bloco-acompanhantes");
-  const campoAcompanhantes = el("acompanhantes");
-  const limiteAcompanhantes = el("limite-acompanhantes");
-  const botaoDiminuir = el("diminuir-acompanhantes");
-  const botaoAumentar = el("aumentar-acompanhantes");
-  const numeroAcompanhantes = el("numero-acompanhantes");
-  const totalPessoas = el("total-pessoas");
+  const blocoAcompanhantes =
+    el("bloco-acompanhantes");
 
+  const campoAcompanhantes =
+    el("acompanhantes");
+
+  const limiteAcompanhantes =
+    el("limite-acompanhantes");
+
+  const botaoDiminuir =
+    el("diminuir-acompanhantes");
+
+  const botaoAumentar =
+    el("aumentar-acompanhantes");
+
+  const numeroAcompanhantes =
+    el("numero-acompanhantes");
+
+  const totalPessoas =
+    el("total-pessoas");
+
+  // Token individual
   const token = new URLSearchParams(
     window.location.search
   ).get("token")?.trim();
 
+  // Estado da aplicação
   let statusSelecionado = null;
   let statusSalvo = null;
+
+  let quantidadeAcompanhantes = 0;
   let acompanhantesSalvos = 0;
-  let maxAcompanhantes = 0;
+
+  let maxAcompanhantes = LIMITE_PADRAO;
 
   let carregado = false;
   let enviando = false;
   let prazoServidorEncerrado = false;
 
-  // ==========================================
-  // VALIDAR ELEMENTOS
-  // ==========================================
+  // ========================================
+  // VERIFICAR ELEMENTOS
+  // ========================================
 
-  const elementos = [
+  const elementosObrigatorios = [
     formulario,
     erroConvite,
     nomeConvidado,
@@ -73,27 +94,31 @@
     totalPessoas
   ];
 
-  if (elementos.some((elemento) => !elemento)) {
+  if (
+    elementosObrigatorios.some(
+      (elemento) => !elemento
+    )
+  ) {
     console.error(
-      "Elementos necessários do RSVP não encontrados."
+      "Erro: elementos do RSVP não encontrados."
     );
     return;
   }
 
-  // ==========================================
+  // ========================================
   // MENSAGENS
-  // ==========================================
+  // ========================================
 
   function mostrarMensagem(texto, tipo = "") {
     mensagem.textContent = texto || "";
 
     mensagem.className =
-      "mensagem" + (tipo ? " " + tipo : "");
+      `mensagem${tipo ? " " + tipo : ""}`;
   }
 
-  // ==========================================
+  // ========================================
   // PRAZO
-  // ==========================================
+  // ========================================
 
   function prazoEncerrado() {
     return (
@@ -102,27 +127,9 @@
     );
   }
 
-  function atualizarBloqueio() {
-    const bloqueado = prazoEncerrado() || enviando;
-
-    botaoSim.disabled = bloqueado;
-    botaoNao.disabled = bloqueado;
-    botaoEnviar.disabled = bloqueado;
-    campoAcompanhantes.disabled = bloqueado;
-
-    atualizarContadorVisual();
-
-    if (prazoEncerrado()) {
-      mostrarMensagem(
-        "O prazo para confirmar ou alterar a presença terminou.",
-        "erro"
-      );
-    }
-  }
-
-  // ==========================================
-  // SUPABASE
-  // ==========================================
+  // ========================================
+  // COMUNICAÇÃO COM SUPABASE
+  // ========================================
 
   async function chamarRSVP(dados) {
     let resposta;
@@ -136,7 +143,7 @@
         body: JSON.stringify(dados)
       });
     } catch (erro) {
-      console.error("Erro de conexão:", erro);
+      console.error(erro);
 
       throw new Error(
         "Não foi possível conectar ao servidor."
@@ -149,7 +156,7 @@
       resultado = await resposta.json();
     } catch {
       throw new Error(
-        "O servidor retornou uma resposta inválida."
+        "Resposta inválida do servidor."
       );
     }
 
@@ -158,44 +165,47 @@
         resultado?.erro ||
         resultado?.error ||
         resultado?.message ||
-        "Não foi possível concluir a operação."
+        "Não foi possível realizar a operação."
       );
     }
 
     return resultado;
   }
 
-  function consultarConvite() {
+  async function consultarConvite() {
     return chamarRSVP({
       acao: "consultar",
-      token: token
+      token
     });
   }
 
-  function salvarResposta(status, acompanhantes) {
+  async function salvarResposta(
+    status,
+    acompanhantes
+  ) {
     return chamarRSVP({
       acao: "responder",
-      token: token,
-      status: status,
-      acompanhantes: acompanhantes
+      token,
+      status,
+      acompanhantes
     });
   }
 
-  // ==========================================
-  // STATUS
-  // ==========================================
+  // ========================================
+  // NORMALIZAR STATUS
+  // ========================================
 
-  function normalizarStatus(valor) {
+  function normalizarStatus(status) {
     if (
-      valor === "Confirmado" ||
-      valor === "confirmado"
+      status === "Confirmado" ||
+      status === "confirmado"
     ) {
       return "Confirmado";
     }
 
     if (
-      valor === "Não comparecerá" ||
-      valor === "ausente"
+      status === "Não comparecerá" ||
+      status === "ausente"
     ) {
       return "Não comparecerá";
     }
@@ -203,15 +213,20 @@
     return null;
   }
 
-  // ==========================================
+  // ========================================
   // CONTADOR DE ACOMPANHANTES
-  // ==========================================
+  // ========================================
 
-  function configurarAcompanhantes() {
+  function configurarCampoOculto() {
     campoAcompanhantes.innerHTML = "";
 
-    for (let i = 0; i <= maxAcompanhantes; i++) {
-      const opcao = document.createElement("option");
+    for (
+      let i = 0;
+      i <= maxAcompanhantes;
+      i++
+    ) {
+      const opcao =
+        document.createElement("option");
 
       opcao.value = String(i);
 
@@ -225,50 +240,51 @@
       campoAcompanhantes.appendChild(opcao);
     }
 
-    limiteAcompanhantes.textContent =
-      `Máximo permitido: ${maxAcompanhantes} acompanhante(s).`;
-  }
-
-  function obterQuantidade() {
-    const quantidade = Number(
-      campoAcompanhantes.value
-    );
-
-    return Number.isInteger(quantidade)
-      ? quantidade
-      : 0;
+    campoAcompanhantes.value =
+      String(quantidadeAcompanhantes);
   }
 
   function atualizarContadorVisual() {
-    const quantidade = obterQuantidade();
-
-    const bloqueado =
-      prazoEncerrado() ||
-      enviando ||
-      !carregado ||
-      statusSelecionado !== "Confirmado";
-
     numeroAcompanhantes.textContent =
-      String(quantidade);
+      String(quantidadeAcompanhantes);
 
     totalPessoas.textContent =
-      `Total de pessoas no convite: ${quantidade + 1}`;
+      `Total de pessoas no convite: ${
+        quantidadeAcompanhantes + 1
+      }`;
 
-    botaoDiminuir.disabled =
-      bloqueado || quantidade <= 0;
-
-    botaoAumentar.disabled =
-      bloqueado || quantidade >= maxAcompanhantes;
-  }
-
-  function definirQuantidade(quantidade) {
-    const novaQuantidade = Math.max(
-      0,
-      Math.min(maxAcompanhantes, quantidade)
-    );
+    limiteAcompanhantes.textContent =
+      `Máximo permitido: ${maxAcompanhantes} acompanhante(s).`;
 
     campoAcompanhantes.value =
-      String(novaQuantidade);
+      String(quantidadeAcompanhantes);
+
+    const bloqueado =
+      !carregado ||
+      enviando ||
+      prazoEncerrado() ||
+      statusSelecionado !== "Confirmado";
+
+    botaoDiminuir.disabled =
+      bloqueado ||
+      quantidadeAcompanhantes <= 0;
+
+    botaoAumentar.disabled =
+      bloqueado ||
+      quantidadeAcompanhantes >= maxAcompanhantes;
+  }
+
+  function definirQuantidade(valor) {
+    const numero = Number(valor);
+
+    if (!Number.isInteger(numero)) {
+      return;
+    }
+
+    quantidadeAcompanhantes = Math.max(
+      0,
+      Math.min(maxAcompanhantes, numero)
+    );
 
     atualizarContadorVisual();
   }
@@ -282,36 +298,52 @@
       !mostrar
     );
 
-    if (!mostrar) {
-      definirQuantidade(0);
-    } else {
-      atualizarContadorVisual();
-    }
+    atualizarContadorVisual();
   }
 
-  function obterQuantidadeAcompanhantes() {
-    if (statusSelecionado !== "Confirmado") {
-      return 0;
-    }
+  // ========================================
+  // BOTÕES + E -
+  // ========================================
 
-    const quantidade = obterQuantidade();
+  botaoAumentar.addEventListener(
+    "click",
+    function () {
+      if (
+        !carregado ||
+        enviando ||
+        prazoEncerrado() ||
+        statusSelecionado !== "Confirmado"
+      ) {
+        return;
+      }
 
-    if (
-      !Number.isInteger(quantidade) ||
-      quantidade < 0 ||
-      quantidade > maxAcompanhantes
-    ) {
-      throw new Error(
-        "Selecione uma quantidade válida de acompanhantes."
+      definirQuantidade(
+        quantidadeAcompanhantes + 1
       );
     }
+  );
 
-    return quantidade;
-  }
+  botaoDiminuir.addEventListener(
+    "click",
+    function () {
+      if (
+        !carregado ||
+        enviando ||
+        prazoEncerrado() ||
+        statusSelecionado !== "Confirmado"
+      ) {
+        return;
+      }
 
-  // ==========================================
+      definirQuantidade(
+        quantidadeAcompanhantes - 1
+      );
+    }
+  );
+
+  // ========================================
   // SELEÇÃO DE PRESENÇA
-  // ==========================================
+  // ========================================
 
   function atualizarSelecao() {
     const confirmado =
@@ -343,6 +375,53 @@
     atualizarCampoAcompanhantes();
   }
 
+  function selecionarStatus(status) {
+    if (
+      !carregado ||
+      enviando ||
+      prazoEncerrado()
+    ) {
+      return;
+    }
+
+    const statusAnterior =
+      statusSelecionado;
+
+    statusSelecionado = status;
+
+    if (status === "Não comparecerá") {
+      definirQuantidade(0);
+    }
+
+    if (
+      status === "Confirmado" &&
+      statusAnterior === "Não comparecerá"
+    ) {
+      definirQuantidade(0);
+    }
+
+    atualizarSelecao();
+    mostrarMensagem("");
+  }
+
+  botaoSim.addEventListener(
+    "click",
+    function () {
+      selecionarStatus("Confirmado");
+    }
+  );
+
+  botaoNao.addEventListener(
+    "click",
+    function () {
+      selecionarStatus("Não comparecerá");
+    }
+  );
+
+  // ========================================
+  // RESPOSTA ATUAL
+  // ========================================
+
   function atualizarRespostaAtual() {
     if (!statusSalvo) {
       respostaAtual.textContent = "";
@@ -353,34 +432,47 @@
     respostaAtual.classList.remove("oculto");
 
     if (statusSalvo === "Confirmado") {
-      respostaAtual.textContent =
-        acompanhantesSalvos === 0
-          ? "Sua resposta atual: presença confirmada, sem acompanhantes."
-          : `Sua resposta atual: presença confirmada com ${acompanhantesSalvos} acompanhante(s).`;
+      if (acompanhantesSalvos === 0) {
+        respostaAtual.textContent =
+          "Sua resposta atual: presença confirmada, sem acompanhantes.";
+      } else {
+        respostaAtual.textContent =
+          `Sua resposta atual: presença confirmada com ${acompanhantesSalvos} acompanhante(s).`;
+      }
     } else {
       respostaAtual.textContent =
         "Sua resposta atual: você não poderá comparecer.";
     }
   }
 
-  function selecionarStatus(status) {
-    if (
-      !carregado ||
-      prazoEncerrado() ||
-      enviando
-    ) {
-      return;
+  // ========================================
+  // BLOQUEAR CAMPOS
+  // ========================================
+
+  function atualizarBloqueio() {
+    const bloqueado =
+      prazoEncerrado() || enviando;
+
+    botaoSim.disabled = bloqueado;
+    botaoNao.disabled = bloqueado;
+    botaoEnviar.disabled = bloqueado;
+
+    campoAcompanhantes.disabled =
+      bloqueado;
+
+    atualizarContadorVisual();
+
+    if (prazoEncerrado()) {
+      mostrarMensagem(
+        "O prazo para confirmar ou alterar a presença terminou.",
+        "erro"
+      );
     }
-
-    statusSelecionado = status;
-
-    atualizarSelecao();
-    mostrarMensagem("");
   }
 
-  // ==========================================
-  // CONSULTAR CONVITE
-  // ==========================================
+  // ========================================
+  // CARREGAR CONVITE
+  // ========================================
 
   async function carregarConvite() {
     formulario.classList.add("oculto");
@@ -392,19 +484,22 @@
       return;
     }
 
-    mostrarMensagem("Carregando convite...");
-
     try {
-      const convidado = await consultarConvite();
+      const convidado =
+        await consultarConvite();
 
-      if (!convidado || !convidado.nome) {
-        throw new Error("Convite não encontrado.");
+      if (!convidado?.nome) {
+        throw new Error(
+          "Convite não encontrado."
+        );
       }
 
       nomeConvidado.textContent =
-        "Convite de " + convidado.nome;
+        `Convite de ${convidado.nome}`;
 
-      nomeConvidado.classList.remove("oculto");
+      nomeConvidado.classList.remove(
+        "oculto"
+      );
 
       statusSalvo = normalizarStatus(
         convidado.status
@@ -415,117 +510,88 @@
       prazoServidorEncerrado =
         convidado.prazo_encerrado === true;
 
+      // Utiliza o limite informado pelo servidor.
+      // Se o campo não vier na resposta,
+      // utiliza o limite padrão de 3.
+      const limiteServidor =
+        Number(convidado.max_acompanhantes);
+
       maxAcompanhantes =
-        Number.isInteger(convidado.max_acompanhantes) &&
-        convidado.max_acompanhantes >= 0
-          ? convidado.max_acompanhantes
-          : 0;
+        convidado.max_acompanhantes != null &&
+        Number.isInteger(limiteServidor) &&
+        limiteServidor >= 0
+          ? limiteServidor
+          : LIMITE_PADRAO;
+
+      const quantidadeSalva =
+        Number(convidado.acompanhantes);
 
       acompanhantesSalvos =
-        Number.isInteger(convidado.acompanhantes) &&
-        convidado.acompanhantes >= 0
-          ? convidado.acompanhantes
+        Number.isInteger(quantidadeSalva) &&
+        quantidadeSalva >= 0
+          ? quantidadeSalva
           : 0;
 
-      configurarAcompanhantes();
+      quantidadeAcompanhantes =
+        statusSalvo === "Confirmado"
+          ? Math.min(
+              acompanhantesSalvos,
+              maxAcompanhantes
+            )
+          : 0;
+
+      configurarCampoOculto();
 
       carregado = true;
 
       atualizarSelecao();
-
-      if (statusSalvo === "Confirmado") {
-        definirQuantidade(acompanhantesSalvos);
-      }
-
       atualizarRespostaAtual();
 
-      formulario.classList.remove("oculto");
+      formulario.classList.remove(
+        "oculto"
+      );
 
       mostrarMensagem("");
       atualizarBloqueio();
 
-      console.log("Convite carregado com sucesso.");
+      console.log(
+        "Convite carregado.",
+        {
+          maxAcompanhantes,
+          acompanhantesSalvos
+        }
+      );
 
     } catch (erro) {
       console.error(
-        "Erro ao consultar convite:",
+        "Erro ao carregar convite:",
         erro
       );
 
       carregado = false;
-      formulario.classList.add("oculto");
-      erroConvite.classList.remove("oculto");
 
-      mostrarMensagem(
-        erro.message ||
-        "Não foi possível carregar o convite.",
-        "erro"
+      formulario.classList.add(
+        "oculto"
+      );
+
+      erroConvite.classList.remove(
+        "oculto"
       );
     }
   }
 
-  // ==========================================
-  // BOTÕES DE PRESENÇA
-  // ==========================================
-
-  botaoSim.addEventListener("click", function () {
-    selecionarStatus("Confirmado");
-  });
-
-  botaoNao.addEventListener("click", function () {
-    selecionarStatus("Não comparecerá");
-  });
-
-  // ==========================================
-  // BOTÕES + E -
-  // ==========================================
-
-  botaoDiminuir.addEventListener(
-    "click",
-    function () {
-      if (
-        !carregado ||
-        enviando ||
-        prazoEncerrado() ||
-        statusSelecionado !== "Confirmado"
-      ) {
-        return;
-      }
-
-      definirQuantidade(
-        obterQuantidade() - 1
-      );
-    }
-  );
-
-  botaoAumentar.addEventListener(
-    "click",
-    function () {
-      if (
-        !carregado ||
-        enviando ||
-        prazoEncerrado() ||
-        statusSelecionado !== "Confirmado"
-      ) {
-        return;
-      }
-
-      definirQuantidade(
-        obterQuantidade() + 1
-      );
-    }
-  );
-
-  // ==========================================
+  // ========================================
   // SALVAR RESPOSTA
-  // ==========================================
+  // ========================================
 
   formulario.addEventListener(
     "submit",
     async function (evento) {
       evento.preventDefault();
 
-      if (!carregado || enviando) return;
+      if (!carregado || enviando) {
+        return;
+      }
 
       if (prazoEncerrado()) {
         atualizarBloqueio();
@@ -540,29 +606,37 @@
         return;
       }
 
-      let quantidade;
+      const quantidade =
+        statusSelecionado === "Confirmado"
+          ? quantidadeAcompanhantes
+          : 0;
 
-      try {
-        quantidade =
-          obterQuantidadeAcompanhantes();
-      } catch (erro) {
+      if (
+        !Number.isInteger(quantidade) ||
+        quantidade < 0 ||
+        quantidade > maxAcompanhantes
+      ) {
         mostrarMensagem(
-          erro.message,
+          "Quantidade de acompanhantes inválida.",
           "erro"
         );
         return;
       }
 
       enviando = true;
+
       atualizarBloqueio();
 
-      mostrarMensagem("Salvando sua resposta...");
+      mostrarMensagem(
+        "Salvando sua resposta..."
+      );
 
       try {
-        const resultado = await salvarResposta(
-          statusSelecionado,
-          quantidade
-        );
+        const resultado =
+          await salvarResposta(
+            statusSelecionado,
+            quantidade
+          );
 
         if (resultado?.salvo !== true) {
           throw new Error(
@@ -570,34 +644,41 @@
           );
         }
 
-        statusSalvo = normalizarStatus(
-          resultado.status
-        );
+        const novoStatus =
+          normalizarStatus(resultado.status);
 
-        if (!statusSalvo) {
+        if (!novoStatus) {
           throw new Error(
             "O servidor retornou um status inválido."
           );
         }
 
+        statusSalvo = novoStatus;
+        statusSelecionado = novoStatus;
+
+        const quantidadeRetornada =
+          Number(resultado.acompanhantes);
+
         acompanhantesSalvos =
-          Number.isInteger(resultado.acompanhantes)
-            ? resultado.acompanhantes
+          Number.isInteger(quantidadeRetornada) &&
+          quantidadeRetornada >= 0
+            ? quantidadeRetornada
             : quantidade;
 
-        statusSelecionado = statusSalvo;
-
-        atualizarSelecao();
-
         if (statusSalvo === "Confirmado") {
-          definirQuantidade(acompanhantesSalvos);
+          definirQuantidade(
+            acompanhantesSalvos
+          );
+        } else {
+          definirQuantidade(0);
         }
 
+        atualizarSelecao();
         atualizarRespostaAtual();
 
         if (statusSalvo === "Confirmado") {
           const total =
-            1 + acompanhantesSalvos;
+            acompanhantesSalvos + 1;
 
           mostrarMensagem(
             `Presença confirmada! Total de pessoas neste convite: ${total}.`,
@@ -629,10 +710,11 @@
     }
   );
 
-  // ==========================================
+  // ========================================
   // INICIAR
-  // ==========================================
+  // ========================================
 
+  atualizarContadorVisual();
   carregarConvite();
 
 })();
