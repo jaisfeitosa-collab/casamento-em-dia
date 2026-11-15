@@ -55,6 +55,12 @@ async function carregarPainel() {
       throw error;
     }
 
+    if (data?.erro || data?.error) {
+      throw new Error(
+        String(data.erro || data.error)
+      );
+    }
+
     if (!data || !Array.isArray(data.convidados)) {
       throw new Error("Resposta inválida do servidor.");
     }
@@ -62,7 +68,7 @@ async function carregarPainel() {
     const convidados = data.convidados;
 
     // ========================================
-    // INDICADORES
+    // INDICADORES DE PRESENÇA
     // ========================================
 
     const total = convidados.length;
@@ -98,6 +104,24 @@ async function carregarPainel() {
     // Cada confirmação corresponde a uma pessoa.
     document.getElementById("res-previsto").textContent =
       confirmados.length;
+
+    // ========================================
+    // NOVOS INDICADORES DE ENVIO
+    // ========================================
+
+    const enviados = convidados.filter(
+      c => c.convite_enviado === true
+    );
+
+    const naoEnviados = convidados.filter(
+      c => c.convite_enviado !== true
+    );
+
+    document.getElementById("ind-enviados").textContent =
+      enviados.length;
+
+    document.getElementById("ind-nao-enviados").textContent =
+      naoEnviados.length;
 
     // ========================================
     // GRÁFICO DE ROSCA
