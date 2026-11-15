@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lista de convidados | Meu Coração</title>
+  <link rel="preload" href="fonts/playfair-display-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/meu-coracao.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="lateral">
+      <a class="logo" href="painel.html" aria-label="Meu Coração">
+        <img src="img/logo-branco.png" alt="meu♥">
+      </a>
+
+      <nav>
+        <a href="painel.html"><i class="ic ic-dash"></i> Dashboard</a>
+        <a class="ativo" href="convidados.html"><i class="ic ic-users"></i> Convidados</a>
+        <a href="#"><i class="ic ic-report"></i> Relatórios</a>
+        <a href="#"><i class="ic ic-gear"></i> Configurações</a>
+      </nav>
+
+      <a class="sair" href="login.html" id="btn-sair">
+        <i class="ic ic-sair"></i> Sair
+      </a>
+    </aside>
+
+    <main class="conteudo lista-pagina">
+      <div class="cabecalho-lista">
+        <div>
+          <h1>Lista de convidados</h1>
+          <p class="legenda">Gerencie os convidados e acompanhe suas respostas</p>
+          <p class="aviso-admin">
+            Área do administrador: aqui você vê quem confirmou presença.
+          </p>
+        </div>
+
+        <button class="botao-contorno" id="adicionar" type="button">
+          <i class="ic ic-mais"></i> Adicionar convidado
+        </button>
+      </div>
+
+      <div class="filtros">
+        <label class="campo">
+          <i class="ic ic-search"></i>
+          <input id="busca" type="search" placeholder="Buscar por nome...">
+        </label>
+
+        <select id="filtro-status" aria-label="Filtrar por status">
+          <option value="">Todos os status</option>
+          <option value="Confirmado">Confirmado</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Não comparecerá">Não comparecerá</option>
+        </select>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40%">Nome</th>
+            <th style="width:40%">Status</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="corpo">
+          <tr><td colspan="3">Carregando convidados...</td></tr>
+        </tbody>
+      </table>
+
+      <div class="rodape-tabela">
+        <div class="paginas" id="paginas"></div>
+        <span id="contagem"></span>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="js/convidados.js"></script>
+</body>
+</html>
