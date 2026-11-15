@@ -1,0 +1,57 @@
+/* Visual da tela de RSVP (baseado no protótipo da Beatriz) */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap');
+
+/* Para usar a foto de fundo: coloque o arquivo em css/ ou img/ e troque a linha abaixo, ex.: url("../img/fundo.jpg") */
+:root { --foto-fundo: none; --rosa-btn: #b86b79; }
+
+.pagina-rsvp { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; }
+.rsvp-page {
+  min-height: 100vh; display: grid; place-items: center; padding: 90px 20px 40px; position: relative;
+  background: var(--foto-fundo) center / cover no-repeat,
+    radial-gradient(circle at 85% 20%, #f6c9c2 0, transparent 38%),
+    radial-gradient(circle at 10% 90%, #f8dede 0, transparent 40%),
+    #fbefee;
+}
+.rsvp-logo {
+  position: absolute; top: 26px; left: 28px; width: 64px; height: 64px; display: grid; place-items: center;
+  border: 1px solid #5b4a4d; border-radius: 50%; background: rgba(255,255,255,.7);
+  color: #4a3b3e; text-decoration: none; font: 600 1.3rem 'Playfair Display', Georgia, serif;
+}
+.rsvp-logo span { color: #c0392b; font-size: .8rem; margin-left: 2px; align-self: end; }
+
+.rsvp-card {
+  width: min(100%, 430px); padding: 34px 30px 30px; text-align: center;
+  background: #fff; border-radius: 18px; box-shadow: 0 18px 50px rgba(120, 70, 80, .14);
+}
+.rsvp-card h1, .rsvp-card h2 { margin: 0 0 8px; color: #2f2527; font-size: 1.9rem; }
+.rsvp-sub { margin: 0 0 18px; color: #3f3436; }
+.rsvp-mensagem { margin: 0; color: #5a4a4d; font-size: 1.15rem; }
+.rsvp-mensagem[hidden] { display: none; }
+
+.rsvp-detalhes { list-style: none; margin: 0 0 22px; padding: 12px 16px; text-align: left; background: #fbeeed; border-radius: 10px; font-size: 1rem; }
+.rsvp-detalhes li + li { margin-top: 6px; }
+
+.rsvp-btn { background: var(--rosa-btn); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.05rem; padding: 12px 28px; }
+.rsvp-btn:hover { background: #9d5663; }
+.rsvp-btn:disabled { opacity: .6; cursor: wait; }
+
+#form-rsvp { text-align: center; }
+.rsvp-pergunta { margin: 22px 0 12px; font: 600 1.25rem 'Playfair Display', Georgia, serif; color: #2f2527; }
+.rsvp-atual { margin: 0 0 6px; padding: 8px 12px; border-radius: 8px; background: #fbeeed; color: #6a4a50; font-size: 1rem; }
+.rsvp-opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.rsvp-opcao { display: block; cursor: pointer; }
+.rsvp-opcao input { position: absolute; opacity: 0; pointer-events: none; }
+.rsvp-opcao span {
+  display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 8px 10px;
+  border: 1px solid #e3b8bd; border-radius: 10px; background: #fff; color: #5a4a4d; font-size: .98rem; line-height: 1.2; transition: .15s;
+}
+.rsvp-opcao input:checked + span { background: #f1d3d6; border-color: var(--rosa-btn); color: #3b2a2e; font-weight: 700; }
+.rsvp-opcao input:focus-visible + span { outline: 3px solid #dfbfc4; outline-offset: 2px; }
+#form-rsvp .help-text { margin: 0 0 18px; }
+
+@media (max-width: 520px) {
+  .rsvp-page { padding-top: 100px; }
+  .rsvp-logo { left: 18px; top: 18px; }
+  .rsvp-card { padding: 28px 20px 24px; }
+  .rsvp-opcoes { grid-template-columns: 1fr; }
+}
