@@ -1,124 +1,109 @@
-import { supabase } from "./supabase.js";
+// RSVP do convidado (US04–US08) — versão com DADOS FICTÍCIOS (mock).
+// Depois da integração, troque apenas as duas funções da seção "ACESSO AOS DADOS"
+// para chamarem a Edge Function rsvp-convidado do Supabase.
+// Precisa de js/dados-mock.js carregado antes.
 
-// ========================================
-// RSVP DO CONVIDADO - US04, US05, US06 (TASK03)
-// ========================================
+(function () {
+  // ---------- CONFIGURAÇÃO (decisões pendentes com a equipe) ----------
+  var MAX_ACOMPANHANTES = 2;   // máximo de acompanhantes por convite
+  var PRAZO_ALTERACAO = null;  // ex.: "2026-11-25T23:59:59-03:00" (null = sem prazo)
+  // --------------------------------------------------------------------
 
-// Enquanto a função do Supabase não existir, deixe true (usa dados fictícios).
-// Quando a função "rsvp-convidado" estiver publicada, troque para false.
-const USAR_MOCK = true;
-
-// Tokens fictícios para testar: index.html?token=teste-ana
-const CONVIDADOS_MOCK = {
-  "teste-ana": { nome: "Ana Exemplo", status: "Pendente" },
-  "teste-bruno": { nome: "Bruno Exemplo", status: "Confirmado" }
-};
-
-const formulario = document.getElementById("form-rsvp");
-const mensagem = document.getElementById("rsvp-mensagem");
-const boasVindas = document.getElementById("boas-vindas");
-const btnComecar = document.getElementById("btn-comecar");
-const campoNome = document.getElementById("nome-convidado");
-const respostaAtual = document.getElementById("rsvp-resposta-atual");
-const botao = document.getElementById("btn-enviar");
-
-const token = new URLSearchParams(window.location.search).get("token");
-
-function mostrarMensagem(texto) {
-  mensagem.textContent = texto;
-  mensagem.hidden = false;
-}
-
-// ---------- Comunicação (real ou mock) ----------
-
-async function buscarConvite(token) {
-  if (USAR_MOCK) {
-    const c = CONVIDADOS_MOCK[token];
-    return c ? { sucesso: true, ...c } : { sucesso: false };
+  // ---------- ACESSO AOS DADOS (mock) ----------
+  function consultarConvite(token) {
+    var achado = DadosMock.ler().filter(function (c) { return c.token === token; })[0];
+    return Promise.resolve(achado || null);
   }
-  const { data, error } = await supabase.functions.invoke("rsvp-convidado", {
-    body: { acao: "buscar", token }
-  });
-  if (error) throw error;
-  return data;
-}
-
-async function enviarResposta(token, status) {
-  if (USAR_MOCK) {
-    if (!CONVIDADOS_MOCK[token]) return { sucesso: false };
-    CONVIDADOS_MOCK[token].status = status;
-    return { sucesso: true, status };
+  function salvarResposta(token, status, acompanhantes) {
+    var lista = DadosMock.ler();
+    var convidado = lista.filter(function (c) { return c.token === token; })[0];
+    if (!convidado) return Promise.reject(new Error("Convite não encontrado"));
+    convidado.status = status;
+    convidado.acompanhantes = status === "confirmado" ? acompanhantes : 0;
+    convidado.data_resposta = new Date().toISOString();
+    DadosMock.gravar(lista);
+    return Promise.resolve(convidado);
   }
-  const { data, error } = await supabase.functions.invoke("rsvp-convidado", {
-    body: { acao: "responder", token, status }
-  });
-  if (error) throw error;
-  return data;
-}
+  // ---------------------------------------------
 
-// ---------- Tela ----------
+  var el = function (id) { return document.getElementById(id); };
+  var form = el("form-rsvp"), erro = el("erro-convite"), mensagem = el("mensagem");
+  var status = null, qtd = 0;
 
-function mostrarStatusAtual(status) {
-  if (status === "Pendente") {
-    respostaAtual.hidden = true;
-    return;
+  function mostrarMensagem(texto, tipo) {
+    mensagem.textContent = texto || "";
+    mensagem.className = "mensagem" + (tipo ? " " + tipo : "");
   }
-  respostaAtual.textContent = `Sua resposta atual: ${status}. Você pode alterá-la abaixo.`;
-  respostaAtual.hidden = false;
-  const marcado = formulario.querySelector(`input[name="presenca"][value="${status}"]`);
-  if (marcado) marcado.checked = true;
-}
 
-async function iniciar() {
+  function atualizarTela() {
+    el("opcao-sim").classList.toggle("ativa", status === "confirmado");
+    el("opcao-nao").classList.toggle("ativa", status === "ausente");
+    // Acompanhantes ficam sempre visíveis; só somem se o convidado disser que não vai.
+    el("bloco-acompanhantes").classList.toggle("oculto", status === "ausente");
+    el("qtd-acompanhantes").textContent = qtd;
+    el("menos").disabled = qtd <= 0;
+    el("mais").disabled = qtd >= MAX_ACOMPANHANTES;
+    el("limite-acompanhantes").textContent = "Máximo de " + MAX_ACOMPANHANTES + " acompanhantes por convite.";
+  }
+
+  function prazoEncerrado() {
+    return PRAZO_ALTERACAO && new Date() > new Date(PRAZO_ALTERACAO);
+  }
+
+  var token = new URLSearchParams(location.search).get("token");
+
   if (!token) {
-    mostrarMensagem("Link inválido. Use o link individual que você recebeu no convite.");
-    return;
+    erro.classList.remove("oculto");
+  } else {
+    consultarConvite(token.trim()).then(function (convidado) {
+      if (!convidado) { erro.classList.remove("oculto"); return; }
+
+      form.classList.remove("oculto");
+      el("nome-convidado").textContent = "Convite de " + convidado.nome;
+      el("nome-convidado").classList.remove("oculto");
+
+      if (convidado.status === "confirmado" || convidado.status === "ausente") {
+        status = convidado.status;
+        qtd = convidado.acompanhantes || 0;
+        var atual = el("resposta-atual");
+        atual.classList.remove("oculto");
+        atual.textContent = "Sua resposta atual: " +
+          (status === "confirmado" ? "presença confirmada" : "você não poderá comparecer") +
+          ". Você pode alterá-la abaixo.";
+        if (prazoEncerrado()) {
+          el("enviar").disabled = true;
+          mostrarMensagem("O prazo para alterar a resposta terminou.", "erro");
+        }
+      }
+      atualizarTela();
+    });
   }
-  try {
-    const convite = await buscarConvite(token);
-    if (!convite?.sucesso) {
-      mostrarMensagem("Convite não encontrado. Confira o link ou fale com os noivos.");
-      return;
+
+  el("opcao-sim").addEventListener("click", function () { status = "confirmado"; mostrarMensagem(""); atualizarTela(); });
+  el("opcao-nao").addEventListener("click", function () { status = "ausente"; qtd = 0; mostrarMensagem(""); atualizarTela(); });
+  el("menos").addEventListener("click", function () { if (qtd > 0) { qtd--; atualizarTela(); } });
+  el("mais").addEventListener("click", function () {
+    if (qtd < MAX_ACOMPANHANTES) {
+      qtd++;
+      if (!status) status = "confirmado"; // quem adiciona acompanhante está confirmando presença
+      atualizarTela();
     }
-    campoNome.textContent = convite.nome;
-    mostrarStatusAtual(convite.status);
-    mensagem.hidden = true;
-    boasVindas.hidden = false;
-  } catch {
-    mostrarMensagem("Não foi possível carregar o convite. Tente novamente mais tarde.");
-  }
-}
+  });
 
-btnComecar.addEventListener("click", () => {
-  boasVindas.hidden = true;
-  formulario.hidden = false;
-});
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    if (!status) { mostrarMensagem("Escolha se você poderá comparecer.", "erro"); return; }
+    if (prazoEncerrado()) { mostrarMensagem("O prazo para alterar a resposta terminou.", "erro"); return; }
 
-formulario.addEventListener("submit", async (evento) => {
-  evento.preventDefault();
-  const escolha = formulario.querySelector('input[name="presenca"]:checked');
-  if (!escolha) return;
-
-  botao.disabled = true;
-  botao.textContent = "Enviando...";
-  try {
-    const resultado = await enviarResposta(token, escolha.value);
-    if (!resultado?.sucesso) {
-      mostrarMensagem("Não foi possível registrar sua resposta. Tente novamente.");
-      return;
-    }
-    formulario.hidden = true;
-    mostrarMensagem(
-      escolha.value === "Confirmado"
-        ? "Presença confirmada! Obrigado, estamos ansiosos para celebrar com você."
-        : "Resposta registrada. Sentiremos sua falta, obrigado por avisar."
-    );
-  } catch {
-    mostrarMensagem("Erro de conexão. Tente novamente.");
-  } finally {
-    botao.disabled = false;
-    botao.innerHTML = 'Confirmar resposta <span aria-hidden="true">›</span>';
-  }
-});
-
-iniciar();
+    el("enviar").disabled = true;
+    salvarResposta(token.trim(), status, qtd).then(function () {
+      mostrarMensagem(status === "confirmado"
+        ? "Presença confirmada! Obrigado, estamos te esperando."
+        : "Resposta registrada. Sentiremos sua falta!", "ok");
+      el("enviar").disabled = false;
+    }).catch(function (e) {
+      mostrarMensagem(e.message || "Não foi possível salvar. Tente novamente.", "erro");
+      el("enviar").disabled = false;
+    });
+  });
+})();

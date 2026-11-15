@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel | Meu Coração</title>
+  <link rel="preload" href="fonts/playfair-display-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/meu-coracao.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="lateral">
+      <a class="logo" href="painel.html" aria-label="Meu Coração"><img src="img/logo-branco.png" alt="meu♥"></a>
+      <nav>
+        <a class="ativo" href="painel.html"><i class="ic ic-dash"></i> Dashboard</a>
+        <a href="convidados.html"><i class="ic ic-users"></i> Convidados</a>
+        <a href="#"><i class="ic ic-report"></i> Relatórios</a>
+        <a href="#"><i class="ic ic-gear"></i> Configurações</a>
+      </nav>
+      <a class="sair" href="login.html"><i class="ic ic-sair"></i> Sair</a>
+    </aside>
+
+    <!-- ÁREA DO ADMINISTRADOR: aqui o casal vê quem confirmou presença -->
+    <main class="conteudo painel">
+      <div class="topo">
+        <span class="seletor-data"><i class="ic ic-cal"></i> <span id="data-hoje">13/11/2026</span> <i class="ic ic-chev-b"></i></span>
+        <span class="avatar"></span>
+      </div>
+
+      <h1>Olá, Beatriz!</h1>
+      <p class="legenda">Acompanhe as confirmações do seu casamento em tempo real</p>
+      <p class="aviso-admin">Área do administrador: aqui você vê quem confirmou presença.</p>
+
+      <section class="cartoes" aria-label="Indicadores">
+        <div class="numero"><i class="ic ic-users"></i><strong id="ind-total">0</strong>Convidados</div>
+        <div class="numero"><i class="ic ic-check-c"></i><strong id="ind-confirmados">0</strong>Confirmados</div>
+        <div class="numero"><i class="ic ic-alert-c"></i><strong id="ind-pendentes">0</strong>Pendentes</div>
+        <div class="numero"><i class="ic ic-x-c"></i><strong id="ind-ausentes">0</strong>Não irão</div>
+      </section>
+
+      <section class="linha2">
+        <div class="bloco grafico">
+          <h3>Status de confirmações</h3>
+          <div class="grafico-corpo">
+            <div class="rosca" id="rosca" role="img" aria-label="Gráfico de confirmações"></div>
+            <div class="legenda-grafico">
+              <span><i style="background:#b86d76"></i>Confirmados</span>
+              <span><i style="background:#eccfc9"></i>Pendentes</span>
+              <span><i style="background:#faf0ef"></i>Não irão</span>
+            </div>
+          </div>
+        </div>
+        <div class="bloco resumo">
+          <h3>Resumo rápido</h3>
+          <div class="item"><i class="ic ic-pessoas"></i><div><small>Convidados</small><strong id="res-total">0</strong></div></div>
+          <div class="item"><i class="ic ic-moedas"></i><div><small>Total previsto de pessoas</small><strong id="res-previsto">0</strong></div></div>
+        </div>
+      </section>
+
+      <section class="bloco quem-confirmou">
+        <h3>Quem confirmou presença</h3>
+        <ul id="lista-confirmados"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/dados-mock.js"></script>
+  <script>
+    // Lê as respostas dos convidados (mock). Na integração, vem do Supabase (Carine: indicadores).
+    var lista = DadosMock.ler();
+    var total = lista.length;
+    var conf = lista.filter(function (c) { return c.status === "confirmado"; });
+    var aus = lista.filter(function (c) { return c.status === "ausente"; });
+    var pend = total - conf.length - aus.length;
+    var acomp = conf.reduce(function (s, c) { return s + (c.acompanhantes || 0); }, 0);
+
+    document.getElementById("ind-total").textContent = total;
+    document.getElementById("ind-confirmados").textContent = conf.length;
+    document.getElementById("ind-pendentes").textContent = pend;
+    document.getElementById("ind-ausentes").textContent = aus.length;
+    document.getElementById("res-total").textContent = total;
+    document.getElementById("res-previsto").textContent = conf.length + acomp;
+    document.getElementById("data-hoje").textContent = new Date().toLocaleDateString("pt-BR");
+
+    var p1 = total ? conf.length / total * 100 : 0;
+    var p2 = total ? (conf.length + pend) / total * 100 : 0;
+    document.getElementById("rosca").style.background =
+      "conic-gradient(#b86d76 0 " + p1 + "%, #eccfc9 " + p1 + "% " + p2 + "%, #faf0ef " + p2 + "% 100%)";
+
+    var ul = document.getElementById("lista-confirmados");
+    if (!conf.length) { ul.innerHTML = "<li>Ninguém confirmou ainda.</li>"; }
+    conf.forEach(function (c) {
+      var li = document.createElement("li");
+      li.textContent = c.nome + (c.acompanhantes ? " (+" + c.acompanhantes + " acompanhante" + (c.acompanhantes > 1 ? "s" : "") + ")" : "");
+      ul.appendChild(li);
+    });
+  </script>
+</body>
+</html>
