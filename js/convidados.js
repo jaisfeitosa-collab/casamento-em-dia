@@ -50,14 +50,20 @@ document.getElementById("btn-sair")?.addEventListener(
 // COMUNICAÇÃO COM SUPABASE
 // ==========================================
 
-async function chamarAdmin(metodo, dados = null) {
+async function chamarAdmin(metodo, dados = null, acao = null) {
+  const headers = {
+    Authorization: `Bearer ${token}`
+  };
+
+  if (acao) {
+    headers["x-acao"] = acao;
+  }
+
   const { data, error } = await supabase.functions.invoke(
     "admin-convidados",
     {
       method: metodo,
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
+      headers,
       ...(dados !== null ? { body: dados } : {})
     }
   );
@@ -125,27 +131,24 @@ function enviarConviteWhatsApp(convidado) {
     convidado.token_convite
   );
 
- 
-
-const mensagem = [
-  `Olá, *${convidado.nome}*! \u{1F48C}`,
-  "",
-  "Somos da equipe de organização do *Casamento em Dia* e temos o prazer de encaminhar um convite muito especial para você! \u{1F48D}\u2728",
-  "",
-  "Você foi convidado(a) para celebrar a união de um casal que está preparando esse momento com muito carinho.",
-  "",
-  "\u{1F48C} *Seu convite é individual e está disponível no link abaixo:*",
-  "",
-  "\u{1F517} " + link.href,
-  "",
-  "Pedimos que acesse o convite e registre sua resposta para que possamos organizar todos os detalhes da celebração.",
-  "",
-  "Agradecemos sua atenção e esperamos contar com sua presença nesse dia tão especial! \u2764\uFE0F",
-  "",
-  "*Atenciosamente,*",
-  "*Equipe de Organização | Casamento em Dia*"
-].join("\n");
-
+  const mensagem = [
+    `Olá, *${convidado.nome}*! \u{1F48C}`,
+    "",
+    "Somos da equipe de organização do *Casamento em Dia* e temos o prazer de encaminhar um convite muito especial para você! \u{1F48D}\u2728",
+    "",
+    "Você foi convidado(a) para celebrar a união de um casal que está preparando esse momento com muito carinho.",
+    "",
+    "\u{1F48C} *Seu convite é individual e está disponível no link abaixo:*",
+    "",
+    "\u{1F517} " + link.href,
+    "",
+    "Pedimos que acesse o convite e registre sua resposta para que possamos organizar todos os detalhes da celebração.",
+    "",
+    "Agradecemos sua atenção e esperamos contar com sua presença nesse dia tão especial! \u2764\uFE0F",
+    "",
+    "*Atenciosamente,*",
+    "*Equipe de Organização | Casamento em Dia*"
+  ].join("\n");
 
   const urlWhatsApp =
     "https://wa.me/" +
@@ -153,8 +156,8 @@ const mensagem = [
     "?text=" +
     encodeURIComponent(mensagem);
 
-  // Abre o WhatsApp com a mensagem pronta.
-  // O administrador confirma o envio.
+  // Apenas abre o WhatsApp.
+  // O administrador realiza o envio.
   window.open(
     urlWhatsApp,
     "_blank",
@@ -276,6 +279,7 @@ function desenhar() {
     nomeTexto.textContent = convidado.nome;
 
     const telefoneTexto = document.createElement("small");
+
     telefoneTexto.textContent = convidado.contato
       ? "WhatsApp: +" + convidado.contato
       : "WhatsApp não cadastrado";
@@ -284,9 +288,27 @@ function desenhar() {
     telefoneTexto.style.opacity = "0.7";
     telefoneTexto.style.marginTop = "4px";
 
-    nome.append(nomeTexto, telefoneTexto);
+    // STATUS DE ENVIO DO CONVITE
+    const envioTexto = document.createElement("small");
 
-    // STATUS
+    envioTexto.textContent = convidado.convite_enviado
+      ? "✓ Convite enviado"
+      : "○ Convite não enviado";
+
+    envioTexto.style.display = "block";
+    envioTexto.style.marginTop = "5px";
+
+    envioTexto.style.color = convidado.convite_enviado
+      ? "#258b54"
+      : "#8b7280";
+
+    nome.append(
+      nomeTexto,
+      telefoneTexto,
+      envioTexto
+    );
+
+    // STATUS DE PRESENÇA
     const status = document.createElement("td");
     const etiqueta = document.createElement("span");
 
@@ -301,33 +323,88 @@ function desenhar() {
     const acoes = document.createElement("td");
     acoes.className = "acoes";
 
-    // WHATSAPP
+    // BOTÃO WHATSAPP
     const whatsapp = document.createElement("button");
 
     whatsapp.type = "button";
     whatsapp.title = "Enviar convite pelo WhatsApp";
+
     whatsapp.setAttribute(
       "aria-label",
       `Enviar convite para ${convidado.nome} pelo WhatsApp`
     );
 
-    whatsapp.innerHTML =
-     
-whatsapp.textContent = "✉";
-whatsapp.style.color = "#258b54";
-whatsapp.style.fontSize = "18px";
-whatsapp.style.cursor = "pointer";
-
+    whatsapp.textContent = "✉";
+    whatsapp.style.color = "#258b54";
+    whatsapp.style.fontSize = "18px";
+    whatsapp.style.cursor = "pointer";
 
     whatsapp.addEventListener("click", () => {
       enviarConviteWhatsApp(convidado);
     });
 
-    // EDITAR
+    // BOTÃO MARCAR/DESMARCAR ENVIO
+    const marcarEnvio = document.createElement("button");
+
+    marcarEnvio.type = "button";
+
+    marcarEnvio.textContent =
+      convidado.convite_enviado ? "✓" : "○";
+
+    marcarEnvio.title = convidado.convite_enviado
+      ? "Desmarcar convite enviado"
+      : "Marcar convite como enviado";
+
+    marcarEnvio.setAttribute(
+      "aria-label",
+      marcarEnvio.title
+    );
+
+    marcarEnvio.style.color = convidado.convite_enviado
+      ? "#258b54"
+      : "#8b7280";
+
+    marcarEnvio.style.fontSize = "18px";
+    marcarEnvio.style.cursor = "pointer";
+
+    marcarEnvio.addEventListener("click", async () => {
+      const novoValor = !convidado.convite_enviado;
+
+      marcarEnvio.disabled = true;
+
+      try {
+        await chamarAdmin(
+          "PATCH",
+          {
+            id: convidado.id,
+            convite_enviado: novoValor
+          },
+          "registrar-convite"
+        );
+
+        convidado.convite_enviado = novoValor;
+        desenhar();
+
+      } catch (erro) {
+        console.error(
+          "Erro ao registrar envio:",
+          erro
+        );
+
+        alert(
+          "Não foi possível atualizar o registro de envio."
+        );
+
+        marcarEnvio.disabled = false;
+      }
+    });
+
+    // BOTÃO EDITAR
     const editar = document.createElement("button");
 
     editar.type = "button";
     editar.title = "Editar";
+
     editar.setAttribute(
       "aria-label",
       `Editar ${convidado.nome}`
@@ -340,11 +417,12 @@ whatsapp.style.cursor = "pointer";
       editarConvidado(convidado);
     });
 
-    // EXCLUIR
+    // BOTÃO EXCLUIR
     const excluir = document.createElement("button");
 
     excluir.type = "button";
     excluir.title = "Excluir";
+
     excluir.setAttribute(
       "aria-label",
       `Excluir ${convidado.nome}`
@@ -357,7 +435,12 @@ whatsapp.style.cursor = "pointer";
       excluirConvidado(convidado);
     });
 
-    acoes.append(whatsapp, editar, excluir);
+    acoes.append(
+      whatsapp,
+      marcarEnvio,
+      editar,
+      excluir
+    );
 
     linha.append(nome, status, acoes);
     corpo.appendChild(linha);
